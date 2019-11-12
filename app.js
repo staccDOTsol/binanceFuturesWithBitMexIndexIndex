@@ -1,3 +1,8 @@
+var lowRSI = 20
+var highRSI = 80
+var minCross = 0.045
+
+
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var client = new ccxt.binance(
@@ -118,13 +123,13 @@ if (rsis[a].length > 60){
 	rsis[a].shift()
 }
 theRSI = RSI.calculate({period : 14, values : rsis[a]});
-if (theRSI[0] > 73){
+if (theRSI[0] > highRSI){
 	rsiover = true;
 }
 else {
 	rsiover = false;
 }
-if (theRSI[0] < 27){
+if (theRSI[0] < lowRSI){
 	rsibelow = true;
 }
 else {
@@ -175,7 +180,7 @@ async function doit(){
 	}
 	diff = price / index; 
 	diff = -1 * (1-diff) * 100 
-	if(diff < -0.04 && rsiover){
+	if(diff < -1 * minCross && rsiover){
 		if (selling == 0){
 			//selling = 1;
 			buysell = 0;
@@ -188,7 +193,7 @@ async function doit(){
 		}
 	}
 
-	else if (diff > 0.04 && diff < 100000 && rsibelow){
+	else if (diff > minCross && diff < 100000 && rsibelow){
 		if (buying == 0){
 			//selling = 0;
 			//buying = 1;
