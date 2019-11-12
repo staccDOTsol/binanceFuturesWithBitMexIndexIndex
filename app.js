@@ -15,7 +15,36 @@ var bal_usd;
 var usd_init;
 var bal_btc;
 cancelall()
+async function cancelallbyorderstatus(){
+	ords        = await client.fetchOpenOrders( 'BTC/USDT' )
 
+        for (var order in ords){
+            oid = ords[order] ['info'] ['orderId']
+            side = ords[order]['side']
+for (var o in openorders){
+            if (parseFloat(oid) == parseFloat(openorders[o].id)){
+            //if (buysell == 1 && side == 'buy'){
+            try{
+                await client.cancelOrder( oid , 'BTC/USDT' )
+            }
+            catch (e){
+                console.log(e)
+            
+            }
+        }
+        }
+        //}
+       /* else if (buysell = 0 && side == 'sell'){
+        	try{
+                await client.cancelOrder( oid , 'BTC/USDT' )
+            }
+            catch (e){
+                console.log(e)
+            
+            }
+        }*/
+        }
+    }
 async function cancelall(){
 	ords        = await client.fetchOpenOrders( 'BTC/USDT' )
 
@@ -69,7 +98,7 @@ console.log('bal usd: ' + bal_usd)
 console.log('pnl usd: % ' + -1 * (1-bal_usd/usd_init) * 100)
 console.log('RSI: ' + theRSI[0])
 console.log('diff: ' + diff)
-cancelall()
+cancelallbyorderstatus()
 }, 60000)
 
 const RSI = require('technicalindicators').RSI;
@@ -115,9 +144,28 @@ var index = 0;
 var buying = 0;
 var selling = 0;
 var diff;
+var openorders = []
 setInterval(async function(){
-	//console.log('diff: ' + diff)
-}, 60000)
+	var trades = await client.fapiPrivateGetUserTrades({'symbol':'BTCUSDT', 'limit': 1000})
+	for(var t in trades){
+		for (var o in openorders){
+			if (parseFloat(openorders[o]['id']) == parseFloat(trades[t].orderId)){
+				openorders.indexOf(openorders[o]) !== -1 && openorders.splice(openorders.indexOf(openorders[o]), 1)
+				console.log(' ')
+				console.log('enter tp!')
+				console.log(' ')
+				console.log(openorders)
+				if (trades[t].side == 'SELL'){
+await client.createOrder(  'BTC/USDT', "Limit", 'buy', parseFloat(trades[t].qty), parseFloat(trades[t].price) * 0.995)
+				}
+				else {
+await client.createOrder(  'BTC/USDT', "Limit", 'sell', parseFloat(trades[t].qty), parseFloat(trades[t].price) * 1.005)
+				}
+			}
+		}
+	}
+	//console.log(await client.createOrder(  'BTC/USDT', "Limit", 'sell', 0.001, 8633))
+}, 30000)
 async function doit(){
 	if (price > index){
 		above = 1;
@@ -135,8 +183,7 @@ async function doit(){
 			prc = HA
 			qtybtc  = bal_btc * 125 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / HA    
-			await client.createOrder(  'BTC/USDT', "Limit", 'buy', qty, prc * 0.995)
-			await client.createOrder(  'BTC/USDT', "Limit", 'sell', qty, prc)
+			openorders.push(await client.createOrder(  'BTC/USDT', "Limit", 'sell', qty, prc))
 			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[0] + ' sell!') //ask
 		}
 	}
@@ -149,8 +196,7 @@ async function doit(){
 			prc = LB
 			qtybtc  = bal_btc * 125 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / LB 
-			await client.createOrder(  'BTC/USDT', "Limit", 'sell', qty, prc * 1.005)
-			await client.createOrder(  'BTC/USDT', "Limit", 'buy', qty, prc)
+			openorders.push(await client.createOrder(  'BTC/USDT', "Limit", 'buy', qty, prc))
 			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[0] + ' buy!') //bid
 		}
 	}
