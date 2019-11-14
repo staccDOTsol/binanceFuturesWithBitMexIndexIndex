@@ -209,11 +209,11 @@ setInterval(async function(){
 	var split = false;
 	for (var t in tps){
 		if (tps[t].price <= price && tps[t].direction == 'sell'){
-(await client.createOrder(  'BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 100))
+(await client.createOrder(  'BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price - 100))
 
   			split = true
 		}if (tps[t].price >= price && tps[t].direction == 'buy'){
-(await client.createOrder(  'BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price - 100))
+(await client.createOrder(  'BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price + 100))
 	
 split = true
 		}
@@ -229,11 +229,11 @@ sls.splice(tps.indexOf(tps[t]), 1)
 	split = false;
 	for (var t in sls){
 		if (sls[t].price >= price && sls[t].direction == 'sell'){
-(await client.createOrder(  'BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 100))
+(await client.createOrder(  'BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price - 100))
 
   			split = true
 		}if (sls[t].price <= price && sls[t].direction == 'buy'){
-(await client.createOrder(  'BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price - 100))
+(await client.createOrder(  'BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price + 100))
 
 split = true
 		}
