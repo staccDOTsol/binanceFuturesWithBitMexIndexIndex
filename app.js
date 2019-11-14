@@ -204,6 +204,7 @@ var diff;
 var tps = []
 var sls = []
 var tradesArr= []
+var sltps = []
 var openorders = []
 setInterval(async function(){
 	var split = false;
