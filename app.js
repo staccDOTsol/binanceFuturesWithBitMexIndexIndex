@@ -209,11 +209,11 @@ setInterval(async function(){
 	var split = false;
 	for (var t in tps){
 		if (tps[t].price <= price && tps[t].direction == 'sell'){
-(await client.createOrder(  'BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price - 100))
+sltps.push(await client.createOrder(  'BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 100))
 
   			split = true
 		}if (tps[t].price >= price && tps[t].direction == 'buy'){
-(await client.createOrder(  'BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price + 100))
+sltps.push(await client.createOrder(  'BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price - 100))
 	
 split = true
 		}
@@ -221,6 +221,7 @@ split = true
 
 	}
 	if (split){
+
 		  			tps.indexOf(tps[t]) !== -1 && tps.splice(tps.indexOf(tps[t]), 1)
 sls.splice(tps.indexOf(tps[t]), 1)
 
@@ -229,11 +230,11 @@ sls.splice(tps.indexOf(tps[t]), 1)
 	split = false;
 	for (var t in sls){
 		if (sls[t].price >= price && sls[t].direction == 'sell'){
-(await client.createOrder(  'BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price - 100))
+sltps.push(await client.createOrder(  'BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 100))
 
   			split = true
 		}if (sls[t].price <= price && sls[t].direction == 'buy'){
-(await client.createOrder(  'BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price + 100))
+sltps.push(await client.createOrder(  'BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price - 100))
 
 split = true
 		}
@@ -249,8 +250,15 @@ tps.splice(sls.indexOf(sls[t]), 1)
 			//console.log(trades)
 	//console.log(tradesArr)
 	for(var t in trades){
-			if (!tradesArr.includes(trades[t].id)){
+		go = true;
+		for (var s in sltps){
+			if (sltps[s].id == trades[t].orderId){
+				go = false;
+			}
+		}
+			if (!tradesArr.includes(trades[t].id) && go){
 				tradesArr.push(trades[t].id)
+		
 	console.log(' ')
 				console.log('enter tp!')
 				console.log(' ')
@@ -260,17 +268,17 @@ tps.splice(sls.indexOf(sls[t]), 1)
 
 					sls.push({'direction': 'buy','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 1.0065})
+ 'price': parseFloat(trades[t].price)* 1.0045})
 
 					tps.push({'direction': 'buy','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 1-0.0045})
+ 'price': parseFloat(trades[t].price)* 0.945})
 
 				}
 				else {
 sls.push({'direction': 'sell','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 1-0.065})
+ 'price': parseFloat(trades[t].price)* 0.965})
 
 					tps.push({'direction': 'sell','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
