@@ -260,17 +260,17 @@ tps.splice(sls.indexOf(sls[t]), 1)
 
 					sls.push({'direction': 'buy','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 1.0045})
+ 'price': parseFloat(trades[t].price)* 1.0065})
 
 					tps.push({'direction': 'buy','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 0.945})
+ 'price': parseFloat(trades[t].price)* 0.955})
 
 				}
 				else {
 sls.push({'direction': 'sell','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 0.965})
+ 'price': parseFloat(trades[t].price)* 0.945})
 
 					tps.push({'direction': 'sell','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
