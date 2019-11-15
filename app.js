@@ -223,19 +223,19 @@ split = true
 	}
 	if (split){
 
-		  			tps.indexOf(tps[t]) !== -1 && tps.splice(tps.indexOf(tps[t]), 1)
-sls.splice(tps.indexOf(tps[t]), 1)
+		  			tps.splice(t, 1)
+sls.splice(t, 1)
 
 	}
 
 	split = false;
 	for (var t in sls){
 		if (sls[t].price >= price && sls[t].direction == 'sell'){
-sltps.push(await client.createOrder(  'BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 100))
+sltps.push(await client.createOrder(  'BTC/USDT', "Limit", 'sell', sls[t].amt, sls[t].price + 100))
 
   			split = true
 		}if (sls[t].price <= price && sls[t].direction == 'buy'){
-sltps.push(await client.createOrder(  'BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price - 100))
+sltps.push(await client.createOrder(  'BTC/USDT', "Limit", 'buy', sls[t].amt, sls[t].price - 100))
 
 split = true
 		}
@@ -243,8 +243,8 @@ split = true
 
 	}
 	if (split){
-		  			sls.indexOf(sls[t]) !== -1 && sls.splice(sls.indexOf(sls[t]), 1)
-tps.splice(sls.indexOf(sls[t]), 1)
+		  			tps.splice(t, 1)
+sls.splice(t, 1)
 
 	}
 	var trades = await client.fapiPrivateGetUserTrades({'symbol':'BTCUSDT', 'limit': 1000})
