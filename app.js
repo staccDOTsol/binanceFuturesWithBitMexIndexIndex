@@ -1,13 +1,13 @@
-var lowRSI = 27
-var highRSI = 73
+var lowRSI = 32
+var highRSI = 68
 var minCross = 0.046
 var useMFI = true
 
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var client = new ccxt.binance(
-            {"apiKey": "z4GiNxIiJRCxfTtbKqcSgSXcbNJqLKW5qNRarj6K9PeGzXoAKChot0UesyUwhCaI",
-            "secret": "vW57vcFOSeA1yrdSonds31QF7LHnnBDg763LnCHOQWMalPjX2mvudvKqTqWL6pmz",
+            {"apiKey": "W58pdOrINzXJCE3HXOgM8eY5f5UhJwoLhyO2eyftGvTZO6RKEVUgWzx8l3kh673o",
+            "secret": "GLWOH6kOcraAatmbysPXCzY96JOepMC8bo970s69lfPjmbo0DqGkF0hfgketSpQq",
             "options":{"defaultMarket":"futures"},
             'urls': {'api': {
                                      'public': 'https://fapi.binance.com/fapi/v1',
@@ -97,7 +97,7 @@ setInterval(async function(){
 		for (var t in trades){
 		tradesArr.push(trades[t].id)
 }
-ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 74, params = {})
+ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 17, params = {})
 		//console.log(ohlcv)
 		var c = 0;
 				for (var candle in ohlcv){
@@ -120,16 +120,16 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefine
 	close = []
 	volume = []
 	for (var o in ohlcvs){
-		high.push(ohlcvs[o][1])
-		low.push(ohlcvs[o][2])
-		close.push(ohlcvs[o][3])
-		volume.push(ohlcvs[o][4])
+		high.push(ohlcvs[o][2])
+		low.push(ohlcvs[o][3])
+		close.push(ohlcvs[o][4])
+		volume.push(ohlcvs[o][5])
 	}
 		//console.log(rsis[0])
-		console.log(high)
+		//console.log(high)
 		theRSI = RSI.calculate({period : 14, values : rsis[0]});
 		theMFI = MFI.calculate({period : 14, high: high, low:low, close: close, volume: volume});
-		console.log(theMFI[theMFI.length-1])
+		//console.log(theMFI[theMFI.length-1])
 	}
 pos = await client.fapiPrivateGetPositionRisk()
 if (pos[0] != undefined){
@@ -165,6 +165,7 @@ console.log('pnl btc: % ' + -1 * (1-bal_btc/initial_bal) * 100)
 console.log('bal usd: ' + bal_usd)
 console.log('pnl usd: % ' + -1 * (1-bal_usd/usd_init) * 100)
 console.log('RSI: ' + theRSI[theRSI.length-1])
+console.log('MFI: ' + theMFI[theMFI.length-1])
 console.log('diff: ' + diff)
 cancelall()
 }
@@ -192,20 +193,20 @@ if (rsis[a].length > 15){
 	rsis[a].shift()
 }
 theRSI = RSI.calculate({period : 14, values : rsis[a]});
-ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 74, params = {})
+ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 17, params = {})
 high = []
 	low = []
 	close = []
 	volume = []
 	for (var o in ohlcv){
-		high.push(ohlcv[o][1])
-		low.push(ohlcv[o][2])
-		close.push(ohlcv[o][3])
-		volume.push(ohlcv[o][4])
+		high.push(ohlcv[o][2])
+		low.push(ohlcv[o][3])
+		close.push(ohlcv[o][4])
+		volume.push(ohlcv[o][5])
 	}
-console.log(high)
+//console.log(high)
 		theMFI = MFI.calculate({period : 14, high: high, low:low, close: close, volume: volume});
-		console.log(theMFI[theMFI.length-1])
+		//console.log(theMFI[theMFI.length-1])
 
 if (theRSI[theRSI.length-1] > highRSI){
 	rsiover = true;
@@ -349,14 +350,14 @@ async function doit(){
 			buysell = 0;
 			//buying = 0;
 			prc = HA
-			qtybtc  = bal_btc * 125 / 50
+			qtybtc  = bal_btc * 51 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / HA    
 			if (position > 0){
 				qty = qty * 2
 			}
 	openorders.push(await client.createOrder(  'BTC/USDT', "Limit", 'sell', qty, prc))
 
-				console.log(openorders)
+				//console.log(openorders)
 			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length-1] + ' sell!') //ask
 		}
 	}
@@ -367,14 +368,14 @@ async function doit(){
 			//buying = 1;
 			buysell = 1;
 			prc = LB
-			qtybtc  = bal_btc * 125 / 50
+			qtybtc  = bal_btc * 51 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / LB 
 			if (position < 0){
 				qty = qty * 2
 			}
 openorders.push(await client.createOrder(  'BTC/USDT', "Limit", 'buy', qty, prc))
 
-				console.log(openorders)
+				//console.log(openorders)
 
 			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length-1] + ' buy!') //bid
 		}
