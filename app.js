@@ -1,7 +1,7 @@
 var lowRSI = 27
 var highRSI = 73
 var minCross = 0.046
-
+var useMFI = true
 
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
@@ -98,9 +98,10 @@ setInterval(async function(){
 		tradesArr.push(trades[t].id)
 }
 ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 74, params = {})
-		console.log(ohlcv)
+		//console.log(ohlcv)
 		var c = 0;
 				for (var candle in ohlcv){
+					ohlcvs.push[ohlcv[candle]]
 		for (var b = ohlcv.length-1; b >= ohlcv.length-61; b--){
 			if (rsis[c] == undefined){
 				rsis[c] = []
@@ -114,9 +115,21 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefine
 		}
 		c= 0
 	}
-		console.log(rsis[0])
+	high = []
+	low = []
+	close = []
+	volume = []
+	for (var o in ohlcvs){
+		high.push(ohlcvs[o][1])
+		low.push(ohlcvs[o][2])
+		close.push(ohlcvs[o][3])
+		volume.push(ohlcvs[o][4])
+	}
+		//console.log(rsis[0])
+		console.log(high)
 		theRSI = RSI.calculate({period : 14, values : rsis[0]});
-		console.log(theRSI[theRSI.length-1])
+		theMFI = MFI.calculate({period : 14, high: high, low:low, close: close, volume: volume});
+		console.log(theMFI[theMFI.length-1])
 	}
 pos = await client.fapiPrivateGetPositionRisk()
 if (pos[0] != undefined){
@@ -159,12 +172,16 @@ count++;
 }, 2500)
 var count = 0;
 const RSI = require('technicalindicators').RSI;
+const MFI = require('technicalindicators').MFI;
 var rsis = []
 var rsiover = false;
 var rsibelow = false;
+var mfiover = false;
+var mfibelow = false;
 var a = 0
 var buysell = -1
 var theRSI = []
+var theMFI = []
 setInterval(async function(){
 	if (rsis[a] == undefined){
 		rsis[a] = []
@@ -175,6 +192,21 @@ if (rsis[a].length > 15){
 	rsis[a].shift()
 }
 theRSI = RSI.calculate({period : 14, values : rsis[a]});
+ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 74, params = {})
+high = []
+	low = []
+	close = []
+	volume = []
+	for (var o in ohlcv){
+		high.push(ohlcv[o][1])
+		low.push(ohlcv[o][2])
+		close.push(ohlcv[o][3])
+		volume.push(ohlcv[o][4])
+	}
+console.log(high)
+		theMFI = MFI.calculate({period : 14, high: high, low:low, close: close, volume: volume});
+		console.log(theMFI[theMFI.length-1])
+
 if (theRSI[theRSI.length-1] > highRSI){
 	rsiover = true;
 }
@@ -186,6 +218,18 @@ if (theRSI[theRSI.length-1] < lowRSI){
 }
 else {
 	rsibelow = false;
+}
+if (theMFI[theMFI.length-1] > highRSI){
+	mfiover = true;
+}
+else {
+	mfiover = false;
+}
+if (theMFI[theMFI.length-1] < lowRSI){
+	mfibelow = true;
+}
+else {
+	mfibelow = false;
 }
 a++
 if (a == 30){
@@ -289,6 +333,7 @@ sls.push({'direction': 'sell','i': 'BTC/USDT',
 		}
 	//console.log(await client.createOrder(  'BTC/USDT', "Limit", 'sell', 0.001, 8633))
 }, 10000)
+var ohlcvs = []
 async function doit(){
 	if (price > index){
 		above = 1;
@@ -298,7 +343,7 @@ async function doit(){
 	}
 	diff = price / index; 
 	diff = -1 * (1-diff) * 100 
-	if(diff < -1 * minCross / 1.5 && rsiover){
+	if(diff < -1 * minCross / 1.5 && rsiover && (useMFI && mfiover)){
 		if (selling == 0 && (freePerc < 0.8 || position > 0)){
 			//selling = 1;
 			buysell = 0;
@@ -316,7 +361,7 @@ async function doit(){
 		}
 	}
 
-	else if (diff > minCross && diff < 100000 && rsibelow){
+	else if (diff > minCross && diff < 100000 && rsibelow && (useMFI && mfibelow)){
 		if (buying == 0 && (freePerc < 0.8 || position < 0)){
 			//selling = 0;
 			//buying = 1;
