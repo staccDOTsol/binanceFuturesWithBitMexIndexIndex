@@ -156,8 +156,8 @@ if (first){
 
 	//await client.loadProducts () 
 	first = false;
-	usd_init = 50;
-	initial_bal = 50 / LB;
+	usd_init = bal_btc//50;
+	initial_bal = bal_btc / LB;
 }
 if (count >= 4 * 6 * 1){
 	count = 0;
