@@ -6,16 +6,16 @@ var min_withdrawal_perecent = 0.025 // when bot profits 5%, withdraw 2.5%
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var client = new ccxt.binance(
-            {"apiKey": "W58pdOrINzXJCE3HXOgM8eY5f5UhJwoLhyO2eyftGvTZO6RKEVUgWzx8l3kh673o",
-            "secret": "GLWOH6kOcraAatmbysPXCzY96JOepMC8bo970s69lfPjmbo0DqGkF0hfgketSpQq",
+            {"apiKey": "yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL",
+            "secret": "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4",
             "options":{"defaultMarket":"futures"},
             'urls': {'api': {
                                      'public': 'https://fapi.binance.com/fapi/v1',
                                      'private': 'https://fapi.binance.com/fapi/v1',},}
  })
 const binance = require('node-binance-api')().options({
-  APIKEY: 'W58pdOrINzXJCE3HXOgM8eY5f5UhJwoLhyO2eyftGvTZO6RKEVUgWzx8l3kh673o',
-  APISECRET: 'GLWOH6kOcraAatmbysPXCzY96JOepMC8bo970s69lfPjmbo0DqGkF0hfgketSpQq',
+  APIKEY: 'yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL',
+  APISECRET: 'v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4',
   useServerTime: true // If you get timestamp errors, synchronize to server time at startup
 });
 
@@ -156,8 +156,8 @@ if (first){
 
 	//await client.loadProducts () 
 	first = false;
-	usd_init = bal_btc//50;
-	initial_bal = bal_btc / LB;
+	usd_init = bal_usd//50;
+	initial_bal = bal_btc;
 }
 if (count >= 4 * 6 * 1){
 	count = 0;
@@ -187,7 +187,7 @@ console.log('diff: ' + diff)
 cancelall()
 }
 count++;
-}, 2500)
+}, 12500)
 var count = 0;
 const RSI = require('technicalindicators').RSI;
 const MFI = require('technicalindicators').MFI;
