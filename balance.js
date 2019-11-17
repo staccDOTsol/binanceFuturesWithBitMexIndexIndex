@@ -1,14 +1,14 @@
 
 const binance = require('node-binance-api')().options({
-  APIKEY: "z4GiNxIiJRCxfTtbKqcSgSXcbNJqLKW5qNRarj6K9PeGzXoAKChot0UesyUwhCaI",
-  APISECRET: "vW57vcFOSeA1yrdSonds31QF7LHnnBDg763LnCHOQWMalPjX2mvudvKqTqWL6pmz",
+  APIKEY: "yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL",
+  APISECRET: "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4",
   useServerTime: true // If you get timestamp errors, synchronize to server time at startup
 });
 var btc = 0;
 const ccxt = require('ccxt')
 var client = new ccxt.binance(
-            {"apiKey": "z4GiNxIiJRCxfTtbKqcSgSXcbNJqLKW5qNRarj6K9PeGzXoAKChot0UesyUwhCaI",
-            "secret": "vW57vcFOSeA1yrdSonds31QF7LHnnBDg763LnCHOQWMalPjX2mvudvKqTqWL6pmz",
+            {"apiKey": "yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL",
+            "secret": "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4",
             "options":{"defaultMarket":"futures"},
             'urls': {'api': {
                                      'public': 'https://fapi.binance.com/fapi/v1',
@@ -54,7 +54,7 @@ app.use(cors());
 var request = require("request")
 var bodyParser = require('body-parser')
 app.set('view engine', 'ejs');
-app.listen(process.env.PORT || 80, function() {});
+app.listen(process.env.PORT || 8080, function() {});
 app.get('/update', cors(), (req, res) => {
 if (btc != 0){
 btcs.push( [new Date().getTime(), -1 * (1-(btc / btcstart)) * 100])

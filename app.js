@@ -2,7 +2,7 @@ var lowRSI = 32
 var highRSI = 68
 var minCross = 0.046
 var useMFI = true
-var min_withdrawal_perecent = 0.025 // when bot profits 5%, withdraw 2.5%
+var min_withdrawal_perecent = 0.0025 // when bot profits 5%, withdraw 2.5%
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var client = new ccxt.binance(
@@ -171,12 +171,14 @@ console.log('pnl btc: % ' + -1 * (1-bal_btc/initial_bal) * 100)
 console.log('bal usd: ' + bal_usd)
 console.log('pnl usd: % ' + -1 * (1-bal_usd/usd_init) * 100)
 pnlusd = -1 * (1-bal_usd/usd_init) * 100
-if (pnlusd > ((min_withdrawal_perecent) * 2)){
+if (pnlusd > ((min_withdrawal_perecent * 100) * 2)){
+	var new_usd_init = bal_usd * (1-(min_withdrawal_perecent) );
 binance.mgTransferMarginToMain('USDT', (min_withdrawal_perecent) *bal_usd, (error, response) => {
     if (error) {
       console.log(error)
     } else {
-      usd_init = bal_usd * (1-(min_withdrawal_perecent) );
+		
+      usd_init = new_usd_init
 	initial_bal = usd_init / LB;
     }
 });
@@ -187,7 +189,7 @@ console.log('diff: ' + diff)
 cancelall()
 }
 count++;
-}, 12500)
+}, 2500)
 var count = 0;
 const RSI = require('technicalindicators').RSI;
 const MFI = require('technicalindicators').MFI;
