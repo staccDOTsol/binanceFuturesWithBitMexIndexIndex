@@ -2,7 +2,7 @@ var lowRSI = 32
 var highRSI = 68
 var minCross = 0.046
 var useMFI = true
-
+var min_withdrawal_perecent = 0.025 // when bot profits 5%, withdraw 2.5%
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var client = new ccxt.binance(
@@ -13,6 +13,12 @@ var client = new ccxt.binance(
                                      'public': 'https://fapi.binance.com/fapi/v1',
                                      'private': 'https://fapi.binance.com/fapi/v1',},}
  })
+const binance = require('node-binance-api')().options({
+  APIKEY: 'W58pdOrINzXJCE3HXOgM8eY5f5UhJwoLhyO2eyftGvTZO6RKEVUgWzx8l3kh673o',
+  APISECRET: 'GLWOH6kOcraAatmbysPXCzY96JOepMC8bo970s69lfPjmbo0DqGkF0hfgketSpQq',
+  useServerTime: true // If you get timestamp errors, synchronize to server time at startup
+});
+
 var client2 = new ccxt.binance({
              "options":{"defaultMarket":"futures"},
             'urls': {'api': {
@@ -97,7 +103,7 @@ setInterval(async function(){
 		for (var t in trades){
 		tradesArr.push(trades[t].id)
 }
-ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 17, params = {})
+ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 74, params = {})
 		//console.log(ohlcv)
 		var c = 0;
 				for (var candle in ohlcv){
@@ -150,8 +156,8 @@ if (first){
 
 	//await client.loadProducts () 
 	first = false;
-	usd_init = bal_usd;
-	initial_bal = bal_btc;
+	usd_init = 50;
+	initial_bal = 50 / LB;
 }
 if (count >= 4 * 6 * 1){
 	count = 0;
@@ -164,6 +170,17 @@ console.log('bal btc: ' + bal_btc)
 console.log('pnl btc: % ' + -1 * (1-bal_btc/initial_bal) * 100)
 console.log('bal usd: ' + bal_usd)
 console.log('pnl usd: % ' + -1 * (1-bal_usd/usd_init) * 100)
+pnlusd = -1 * (1-bal_usd/usd_init) * 100
+if (pnlusd > ((min_withdrawal_perecent) * 2)){
+binance.mgTransferMarginToMain('USDT', (min_withdrawal_perecent) *bal_usd, (error, response) => {
+    if (error) {
+      console.log(error)
+    } else {
+      usd_init = bal_usd * (1-(min_withdrawal_perecent) );
+	initial_bal = usd_init / LB;
+    }
+});
+}
 console.log('RSI: ' + theRSI[theRSI.length-1])
 console.log('MFI: ' + theMFI[theMFI.length-1])
 console.log('diff: ' + diff)
@@ -318,13 +335,13 @@ sls.splice(t, 1)
 
 					tps.push({'direction': 'buy','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 0.945})
+ 'price': parseFloat(trades[t].price)* (1-0.0025)})
 
 				}
 				else {
 sls.push({'direction': 'sell','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 0.965})
+ 'price': parseFloat(trades[t].price)* (1-0.0045)})
 
 					tps.push({'direction': 'sell','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
@@ -350,7 +367,7 @@ async function doit(){
 			buysell = 0;
 			//buying = 0;
 			prc = HA
-			qtybtc  = bal_btc * 51 / 50
+			qtybtc  = bal_btc * 125 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / HA    
 			if (position > 0){
 				qty = qty * 2
@@ -368,7 +385,7 @@ async function doit(){
 			//buying = 1;
 			buysell = 1;
 			prc = LB
-			qtybtc  = bal_btc * 51 / 50
+			qtybtc  = bal_btc * 125 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / LB 
 			if (position < 0){
 				qty = qty * 2
