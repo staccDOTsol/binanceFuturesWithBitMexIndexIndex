@@ -1,9 +1,9 @@
-var lowRSI = 32
-var highRSI = 68
-var minCross = 0.046
+var lowRSI = 35
+var highRSI = 65
+var minCross = 0.03
 var useMFI = true
-var takeProfit = 2.5 //%
-var stopLoss = -4.5 //%
+var takeProfit = 4.5 //%
+var stopLoss = -6.5 //%
 var min_withdrawal_percent = 0.025 // when bot profits 5%, withdraw 2.5%
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
@@ -154,14 +154,15 @@ position = parseFloat(pos[0]['positionAmt'])
 		await client.createOrder(  'BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
 
 	}
-	if(unrealized < stopLoss){
+}
+	if(unrealized < stopLoss){	console.log(unrealized)
+
 		if (position > 0){
 		await client.createOrder(  'BTC/USDT', "Limit", 'sell', position, LB - 100)
 	} else {
 		await client.createOrder(  'BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
 
 	}
-}
 }
 }
 //console.log(position)
