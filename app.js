@@ -345,7 +345,7 @@ sls.splice(t, 1)
 		}
 			if (!tradesArr.includes(trades[t].id) && go){
 				tradesArr.push(trades[t].id)
-		
+		/*
 	console.log(' ')
 				console.log('enter tp!')
 				console.log(' ')
@@ -371,6 +371,7 @@ sls.push({'direction': 'sell','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* 1.0045})
 }
+		*/
 			}
 		}
 	//console.log(await client.createOrder(  'BTC/USDT', "Limit", 'sell', 0.001, 8633))
