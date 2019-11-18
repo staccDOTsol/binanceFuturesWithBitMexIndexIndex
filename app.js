@@ -163,6 +163,7 @@ position = parseFloat(pos[0]['positionAmt'])
 	}
 }
 }
+}
 //console.log(position)
 account         = await client.fetchBalance()
 free_btc = parseFloat(account[ 'info' ] [ 'totalInitialMargin' ]) / HA
