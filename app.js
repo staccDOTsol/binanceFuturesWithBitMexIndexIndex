@@ -2,7 +2,7 @@ var lowRSI = 32
 var highRSI = 68
 var minCross = 0.046
 var useMFI = true
-var min_withdrawal_perecent = 0.0025 // when bot profits 5%, withdraw 2.5%
+var min_withdrawal_percent = 0.025 // when bot profits 5%, withdraw 2.5%
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var client = new ccxt.binance(
@@ -171,9 +171,9 @@ console.log('pnl btc: % ' + -1 * (1-bal_btc/initial_bal) * 100)
 console.log('bal usd: ' + bal_usd)
 console.log('pnl usd: % ' + -1 * (1-bal_usd/usd_init) * 100)
 pnlusd = -1 * (1-bal_usd/usd_init) * 100
-if (pnlusd > ((min_withdrawal_perecent * 100) * 2)){
-	var new_usd_init = bal_usd * (1-(min_withdrawal_perecent) );
-binance.mgTransferMarginToMain('USDT', (min_withdrawal_perecent) *bal_usd, (error, response) => {
+if (pnlusd > ((min_withdrawal_percent * 100) * 2)){
+	var new_usd_init = bal_usd * (1-(min_withdrawal_percent) );
+binance.mgTransferMarginToMain('USDT', (min_withdrawal_percent) *bal_usd, (error, response) => {
     if (error) {
       console.log(error)
     } else {
@@ -364,7 +364,7 @@ async function doit(){
 	diff = price / index; 
 	diff = -1 * (1-diff) * 100 
 	if(diff < -1 * minCross / 1.5 && rsiover && (useMFI && mfiover)){
-		if (selling == 0 && (freePerc < 0.57 || position > 0)){
+		if (selling == 0 && (freePerc < 1 || position > 0)){
 			//selling = 1;
 			buysell = 0;
 			//buying = 0;
@@ -382,7 +382,7 @@ async function doit(){
 	}
 
 	else if (diff > minCross && diff < 100000 && rsibelow && (useMFI && mfibelow)){
-		if (buying == 0 && (freePerc < 0.57 || position < 0)){
+		if (buying == 0 && (freePerc < 1 || position < 0)){
 			//selling = 0;
 			//buying = 1;
 			buysell = 1;
