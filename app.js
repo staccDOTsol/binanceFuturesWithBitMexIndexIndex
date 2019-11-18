@@ -150,16 +150,17 @@ position = parseFloat(pos[0]['positionAmt'])
 	console.log(unrealized)
 	if(unrealized > takeProfit){
 		if (position > 0){
-		await client.createOrder(  'BTC/USDT', "Limit", 'sell', position, LB + 100)
+			console.log('pos: ' + position)
+		await client.createOrder(  'BTC/USDT', "Limit", 'sell', position, LB - 100)
 	} else {
-		await client.createOrder(  'BTC/USDT', "Limit", 'buy', position * -1, HA - 100)
+		await client.createOrder(  'BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
 
 	}
 	if(unrealized < stopLoss){
 		if (position > 0){
-		await client.createOrder(  'BTC/USDT', "Limit", 'sell', position, LB + 100)
+		await client.createOrder(  'BTC/USDT', "Limit", 'sell', position, LB - 100)
 	} else {
-		await client.createOrder(  'BTC/USDT', "Limit", 'buy', position * -1, HA - 100)
+		await client.createOrder(  'BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
 
 	}
 }
