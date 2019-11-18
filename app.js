@@ -2,6 +2,7 @@ var lowRSI = 35
 var highRSI = 65
 var minCross = 0.03
 var useMFI = true
+var rsiTF = 15
 var takeProfit = 4.5 //%
 var stopLoss = -6.5 //%
 var min_withdrawal_percent = 0.025 // when bot profits 5%, withdraw 2.5%
@@ -105,7 +106,7 @@ setInterval(async function(){
 		for (var t in trades){
 		tradesArr.push(trades[t].id)
 }
-ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 74, params = {})
+ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 74, params = {})
 		//console.log(ohlcv)
 		var c = 0;
 				for (var candle in ohlcv){
@@ -123,6 +124,8 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefine
 		}
 		c= 0
 	}
+	ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 74, params = {})
+
 	high = []
 	low = []
 	close = []
@@ -222,19 +225,20 @@ var rsibelow = false;
 var mfiover = false;
 var mfibelow = false;
 var a = 0
+var b = 0;
 var buysell = -1
 var theRSI = []
 var theMFI = []
 setInterval(async function(){
-	if (rsis[a] == undefined){
-		rsis[a] = []
+	if (rsis[b] == undefined){
+		rsis[b] = []
 	}
-rsis[a].push(price)
+rsis[b].push(price)
 
-if (rsis[a].length > 15){
-	rsis[a].shift()
+if (rsis[b].length > 15){
+	rsis[b].shift()
 }
-theRSI = RSI.calculate({period : 14, values : rsis[a]});
+theRSI = RSI.calculate({period : 14, values : rsis[b]});
 ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 17, params = {})
 high = []
 	low = []
@@ -275,8 +279,12 @@ else {
 	mfibelow = false;
 }
 a++
-if (a == 30){
+if (a == 60){
 	a = 0;
+	b++;
+}
+if (b == rsiTF){
+	b = 0;
 }
 //console.log(theRSI[theRSI.length-1])
 }, 1000);
