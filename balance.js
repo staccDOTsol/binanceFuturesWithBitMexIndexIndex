@@ -4,6 +4,33 @@ const binance = require('node-binance-api')().options({
   APISECRET: "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4",
   useServerTime: true // If you get timestamp errors, synchronize to server time at startup
 });
+
+const Binance = require('binance-api-node').default
+const client2 = Binance({
+  apiKey: 'yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL',
+  apiSecret: 'v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4'
+})
+const api = require('binance');
+const binanceRest = new api.BinanceRest({
+    key: 'yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL', // Get this from your account on binance.com
+    secret: 'v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4', // Same for this
+})
+const binanceWS = new api.BinanceWS(true); // Argument specifies whether the responses should be beautified, defaults to true
+binanceWS.onUserData(binanceRest, (data) => {
+        console.log(data);
+    }, 60000) // Optional, how often the keep alive should be sent in milliseconds
+    .then((ws) => {
+        // websocket instance available here
+    });
+
+async function ws(){
+const clean = await client2.ws.user(msg => {
+  console.log(msg)
+})
+//clean()
+}
+ws()
+
 var btc = 0;
 const ccxt = require('ccxt')
 var client = new ccxt.binance(

@@ -364,12 +364,12 @@ async function doit(){
 	diff = price / index; 
 	diff = -1 * (1-diff) * 100 
 	if(diff < -1 * minCross / 1.5 && rsiover && (useMFI && mfiover)){
-		if (selling == 0 && (freePerc < 0.8 || position > 0)){
+		if (selling == 0 && (freePerc < 0.57 || position > 0)){
 			//selling = 1;
 			buysell = 0;
 			//buying = 0;
 			prc = HA
-			qtybtc  = bal_btc * 125 / 50
+			qtybtc  = bal_btc * 20 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / HA    
 			if (position > 0){
 				qty = qty * 2
@@ -382,12 +382,12 @@ async function doit(){
 	}
 
 	else if (diff > minCross && diff < 100000 && rsibelow && (useMFI && mfibelow)){
-		if (buying == 0 && (freePerc < 0.8 || position < 0)){
+		if (buying == 0 && (freePerc < 0.57 || position < 0)){
 			//selling = 0;
 			//buying = 1;
 			buysell = 1;
 			prc = LB
-			qtybtc  = bal_btc * 125 / 50
+			qtybtc  = bal_btc * 20 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / LB 
 			if (position < 0){
 				qty = qty * 2
