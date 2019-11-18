@@ -353,6 +353,7 @@ sls.push({'direction': 'sell','i': 'BTC/USDT',
 		}
 	//console.log(await client.createOrder(  'BTC/USDT', "Limit", 'sell', 0.001, 8633))
 }, 10000)
+var dobuy = true;
 var ohlcvs = []
 async function doit(){
 	if (price > index){
@@ -374,10 +375,17 @@ async function doit(){
 			if (position > 0){
 				qty = qty * 2
 			}
+			if (dobuy){
+				dobuy = false;
+				setTimeout(function(){
+					dobuy = true;
+				}, 1000)
+			
 	openorders.push(await client.createOrder(  'BTC/USDT', "Limit", 'sell', qty, prc))
 
 				//console.log(openorders)
 			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length-1] + ' sell!') //ask
+		}
 		}
 	}
 
@@ -392,12 +400,20 @@ async function doit(){
 			if (position < 0){
 				qty = qty * 2
 			}
+				if (dobuy){
+				dobuy = false;
+				setTimeout(function(){
+					dobuy = true;
+				}, 1000)
+		
 openorders.push(await client.createOrder(  'BTC/USDT', "Limit", 'buy', qty, prc))
 
 				//console.log(openorders)
 
 			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length-1] + ' buy!') //bid
-		}
+		
+		}}
+
 	}
 }
  ws.addStream('XBTUSD', 'instrument', async function (data, symbol, tableName) {
