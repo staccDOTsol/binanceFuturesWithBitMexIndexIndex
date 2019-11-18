@@ -2,6 +2,7 @@ var lowRSI = 32
 var highRSI = 68
 var minCross = 0.046
 var useMFI = true
+var takeProfit = 2.5 //%
 var min_withdrawal_percent = 0.025 // when bot profits 5%, withdraw 2.5%
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
@@ -138,15 +139,24 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefine
 		//console.log(theMFI[theMFI.length-1])
 	}
 pos = await client.fapiPrivateGetPositionRisk()
-if (pos[0] != undefined){
-position = parseFloat(pos[0]['positionAmt'])
-}
-//console.log(position)
-account         = await client.fetchBalance()
 ticker = await client.fetchTicker( 'BTC/USDT' )
 LB           = ticker.last + 0.5
 //console.log(await client.fetchTicker( 'BTC/USDT' ))
 HA= ticker.last - 0.5
+if (pos[0] != undefined){
+position = parseFloat(pos[0]['positionAmt'])
+	unrealized = parseFloat( pos[0]['unRealizedProfit']) / (position * HA) * parseFloat(pos[0]['leverage']) * 100
+	if(unrealized > takeProfit){
+		if (position > 0){
+		await client.createOrder(  'BTC/USDT', "Limit", 'sell', position, LB + 100)
+	} else {
+		await client.createOrder(  'BTC/USDT', "Limit", 'buy', position, HA - 100)
+
+	}
+}
+}
+//console.log(position)
+account         = await client.fetchBalance()
 free_btc = parseFloat(account[ 'info' ] [ 'totalInitialMargin' ]) / HA
 
 bal_btc         = parseFloat(account[ 'info' ] [ 'totalMarginBalance' ]) / HA
@@ -158,6 +168,9 @@ if (first){
 	first = false;
 	usd_init = bal_usd//50;
 	initial_bal = bal_btc;
+	qtybtc  = bal_btc * 50 / 50
+			qty = Math.floor( HA * qtybtc / 10 )   / HA
+			console.log('qty: ' + qty)
 }
 if (count >= 4 * 6 * 1){
 	count = 0;
@@ -353,6 +366,7 @@ sls.push({'direction': 'sell','i': 'BTC/USDT',
 		}
 	//console.log(await client.createOrder(  'BTC/USDT', "Limit", 'sell', 0.001, 8633))
 }, 10000)
+
 var dobuy = true;
 var ohlcvs = []
 async function doit(){
@@ -370,7 +384,7 @@ async function doit(){
 			buysell = 0;
 			//buying = 0;
 			prc = HA
-			qtybtc  = bal_btc * 20 / 50
+			qtybtc  = bal_btc * 50 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / HA    
 			if (position > 0){
 				qty = qty * 2
@@ -395,7 +409,7 @@ async function doit(){
 			//buying = 1;
 			buysell = 1;
 			prc = LB
-			qtybtc  = bal_btc * 20 / 50
+			qtybtc  = bal_btc * 50 / 50
 			qty = Math.floor( prc * qtybtc / 10 )   / LB 
 			if (position < 0){
 				qty = qty * 2
