@@ -147,6 +147,7 @@ HA= ticker.last - 0.5
 if (pos[0] != undefined){
 position = parseFloat(pos[0]['positionAmt'])
 	unrealized = parseFloat( pos[0]['unRealizedProfit']) / (position * HA) * parseFloat(pos[0]['leverage']) * 100
+	console.log(unrealized)
 	if(unrealized > takeProfit){
 		if (position > 0){
 		await client.createOrder(  'BTC/USDT', "Limit", 'sell', position, LB + 100)
