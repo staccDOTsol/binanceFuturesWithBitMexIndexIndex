@@ -2,7 +2,9 @@ var lowRSI = 35
 var highRSI = 65
 var minCross = 0.03
 var useMFI = true
-var rsiTF = 15
+var rsiTF = 5
+var mfiTF = 15
+var delaybetweenorder = 0.5 //sec
 var takeProfit = 4.5 //%
 var stopLoss = -6.5 //%
 var min_withdrawal_percent = 0.025 // when bot profits 5%, withdraw 2.5%
@@ -109,23 +111,18 @@ setInterval(async function(){
 ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 74, params = {})
 		//console.log(ohlcv)
 		var c = 0;
-				for (var candle in ohlcv){
-					ohlcvs.push[ohlcv[candle]]
-		for (var b = ohlcv.length-1; b >= ohlcv.length-61; b--){
-			if (rsis[c] == undefined){
-				rsis[c] = []
+		for (var b in ohlcv){
+					ohlcvs.push[ohlcv[b]]
+			if (rsis[0] == undefined){
+				rsis[0] = []
 			}
-			rsis[c].push(ohlcv[candle][4])
-			rsis[c].push(ohlcv[candle][4])
-		if (rsis[c].length > 15){
-			rsis[c].shift()
+			rsis[0].push(ohlcv[b][4])
+		if (rsis[0].length > 70){
+			rsis[0].shift()
 		}
-		c++
 		}
-		c= 0
-	}
 	ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 74, params = {})
-
+//console.log(ohlcv)
 	high = []
 	low = []
 	close = []
@@ -138,7 +135,8 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm'
 	}
 		//console.log(rsis[0])
 		//console.log(high)
-		theRSI = RSI.calculate({period : 14, values : rsis[0]});
+theRSI = RSI.calculate({ rsiPeriod : 14, stochasticPeriod: 14, kPeriod: 3, dPeriod: 3,values : rsis[0]});
+
 		theMFI = MFI.calculate({period : 14, high: high, low:low, close: close, volume: volume});
 		//console.log(theMFI[theMFI.length-1])
 	}
@@ -212,7 +210,7 @@ binance.mgTransferMarginToMain('USDT', (min_withdrawal_percent) *bal_usd, (error
     }
 });
 }
-console.log('RSI: ' + theRSI[theRSI.length-1])
+console.log('RSI: ' + theRSI[theRSI.length-1].k)
 console.log('MFI: ' + theMFI[theMFI.length-1])
 console.log('diff: ' + diff)
 cancelall()
@@ -220,7 +218,7 @@ cancelall()
 count++;
 }, 2500)
 var count = 0;
-const RSI = require('technicalindicators').RSI;
+const RSI = require('technicalindicators').StochasticRSI;
 const MFI = require('technicalindicators').MFI;
 var rsis = []
 var rsiover = false;
@@ -229,19 +227,26 @@ var mfiover = false;
 var mfibelow = false;
 var a = 0
 var b = 0;
+var rsicount = 0;
 var buysell = -1
 var theRSI = []
 var theMFI = []
 setInterval(async function(){
-	if (rsis[b] == undefined){
-		rsis[b] = []
-	}
-rsis[b].push(price)
+ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 74, params = {})
+		//console.log(ohlcv)
+		var c = 0;
+		for (var b in ohlcv){
+					ohlcvs.push[ohlcv[b]]
+			if (rsis[0] == undefined){
+				rsis[0] = []
+			}
+			rsis[0].push(ohlcv[b][4])
+		if (rsis[0].length > 70){
+			rsis[0].shift()
+		}
+		}
+theRSI = RSI.calculate({ rsiPeriod : 14, stochasticPeriod: 14, kPeriod: 3, dPeriod: 3,values : rsis[0]});
 
-if (rsis[b].length > 15){
-	rsis[b].shift()
-}
-theRSI = RSI.calculate({period : 14, values : rsis[b]});
 ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 17, params = {})
 high = []
 	low = []
@@ -257,13 +262,13 @@ high = []
 		theMFI = MFI.calculate({period : 14, high: high, low:low, close: close, volume: volume});
 		//console.log(theMFI[theMFI.length-1])
 
-if (theRSI[theRSI.length-1] > highRSI){
+if (theRSI[theRSI.length-1].k > highRSI){
 	rsiover = true;
 }
 else {
 	rsiover = false;
 }
-if (theRSI[theRSI.length-1] < lowRSI){
+if (theRSI[theRSI.length-1].k < lowRSI){
 	rsibelow = true;
 }
 else {
@@ -282,6 +287,7 @@ else {
 	mfibelow = false;
 }
 a++
+
 if (a == 60){
 	a = 0;
 	b++;
@@ -289,7 +295,7 @@ if (a == 60){
 if (b == rsiTF){
 	b = 0;
 }
-//console.log(theRSI[theRSI.length-1])
+//console.log(theRSI[theRSI.length-1].k)
 }, 1000);
 
 var ws = new WebSocket();
@@ -415,12 +421,12 @@ async function doit(){
 				dobuy = false;
 				setTimeout(function(){
 					dobuy = true;
-				}, 1000)
+				}, delaybetweenorder * 1000)
 			
 	openorders.push(await client.createOrder(  'BTC/USDT', "Limit", 'sell', qty, prc))
 
 				//console.log(openorders)
-			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length-1] + ' sell!') //ask
+			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length-1].k + ' sell!') //ask
 		}
 		}
 	}
@@ -440,13 +446,13 @@ async function doit(){
 				dobuy = false;
 				setTimeout(function(){
 					dobuy = true;
-				}, 1000)
+				}, delaybetweenorder * 1000)
 		
 openorders.push(await client.createOrder(  'BTC/USDT', "Limit", 'buy', qty, prc))
 
 				//console.log(openorders)
 
-			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length-1] + ' buy!') //bid
+			console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length-1].k + ' buy!') //bid
 		
 		}}
 

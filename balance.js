@@ -44,6 +44,7 @@ pos = await client.fapiPrivateGetPositionRisk()
 if (pos[0] != undefined){
 position = parseFloat(pos[0]['positionAmt'])
 }
+console.log(account.info.assets)
 btc = parseFloat(account[ 'info' ] [ 'totalMarginBalance' ])
 btc+=(account2['total']['USDT'])
 if (first)
