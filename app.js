@@ -4,6 +4,9 @@ var minCross = 0.03
 var useMFI = true
 var rsiTF = 5
 var mfiTF = 15
+var period = 54
+var kvalue = 4
+var dvalue = 3
 var delaybetweenorder = 0.5 //sec
 var takeProfit = 4.5 //%
 var stopLoss = -6.5 //%
@@ -117,11 +120,11 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm'
 				rsis[0] = []
 			}
 			rsis[0].push(ohlcv[b][4])
-		if (rsis[0].length > 70){
+		if (rsis[0].length > 1000){
 			rsis[0].shift()
 		}
 		}
-	ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 74, params = {})
+	ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
 //console.log(ohlcv)
 	high = []
 	low = []
@@ -135,7 +138,7 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm'
 	}
 		//console.log(rsis[0])
 		//console.log(high)
-theRSI = RSI.calculate({ rsiPeriod : 14, stochasticPeriod: 14, kPeriod: 3, dPeriod: 3,values : rsis[0]});
+theRSI = RSI.calculate({ rsiPeriod : period, stochasticPeriod: period, kPeriod: kvalue, dPeriod: dvalue,values : rsis[0]});
 
 		theMFI = MFI.calculate({period : 14, high: high, low:low, close: close, volume: volume});
 		//console.log(theMFI[theMFI.length-1])
@@ -232,7 +235,7 @@ var buysell = -1
 var theRSI = []
 var theMFI = []
 setInterval(async function(){
-ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 74, params = {})
+ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
 		//console.log(ohlcv)
 		var c = 0;
 		for (var b in ohlcv){
@@ -241,11 +244,11 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm'
 				rsis[0] = []
 			}
 			rsis[0].push(ohlcv[b][4])
-		if (rsis[0].length > 70){
+		if (rsis[0].length > 1000){
 			rsis[0].shift()
 		}
 		}
-theRSI = RSI.calculate({ rsiPeriod : 14, stochasticPeriod: 14, kPeriod: 3, dPeriod: 3,values : rsis[0]});
+theRSI = RSI.calculate({ rsiPeriod : period, stochasticPeriod: period, kPeriod: kvalue, dPeriod: dvalue,values : rsis[0]});
 //console.log(theRSI[theRSI.length-1].k)
 ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 17, params = {})
 high = []
