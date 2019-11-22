@@ -16,7 +16,7 @@ const ccxt = require('ccxt')
 var client = new ccxt.binance(
             {"apiKey": "yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL",
             "secret": "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4",
-            "options":{"defaultMarket":"futures"},
+            "options":{"defaultMarket":"futures"}, 'enableRateLimit': true,
             'urls': {'api': {
                                      'public': 'https://fapi.binance.com/fapi/v1',
                                      'private': 'https://fapi.binance.com/fapi/v1',},}
@@ -28,7 +28,7 @@ const binance = require('node-binance-api')().options({
 });
 
 var client2 = new ccxt.binance({
-             "options":{"defaultMarket":"futures"},
+             "options":{"defaultMarket":"futures"}, 'enableRateLimit': true,
             'urls': {'api': {
                                      'public': 'https://fapi.binance.com/fapi/v1',
                                      'private': 'https://fapi.binance.com/fapi/v1',},}
@@ -198,7 +198,10 @@ console.log('position: ' + position)
 console.log('usedPerc: ' + freePerc)
 console.log('rsiover: ' + rsiover)
 console.log('rsibelow: ' + rsibelow)
-
+console.log('selldiff')
+console.log( diff < -1 * minCross / 1.5)
+console.log('buydiff')
+console.log( diff > minCross && diff < 100000)
 console.log('selling: ' + selling)
 console.log('buying: ' + buying)
 console.log('bal btc: ' + bal_btc)
@@ -414,7 +417,7 @@ async function doit(){
 	}
 	diff = price / index; 
 	diff = -1 * (1-diff) * 100 
-	if(diff < -1 * minCross / 1.5 && rsiover){
+	if(diff < -1 * minCross / 1.5 && rsiover){//} && (useMFI && mfiover)){
 		if (selling == 0 && (freePerc < 1 || position > 0)){
 			//selling = 1;
 			buysell = 0;
@@ -439,7 +442,7 @@ async function doit(){
 		}
 	}
 
-	else if (diff > minCross && diff < 100000 && rsibelow){
+	else if (diff > minCross && diff < 100000 && rsibelow){//} && (useMFI && mfibelow)){
 		if (buying == 0 && (freePerc < 1 || position < 0)){
 			//selling = 0;
 			//buying = 1;
