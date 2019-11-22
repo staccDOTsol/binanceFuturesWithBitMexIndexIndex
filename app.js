@@ -1,29 +1,37 @@
-var lowRSI = 35
-var highRSI = 65
-var minCross = 0.03
-var useMFI = true
-var rsiTF = 5
-var mfiTF = 15
-var period = 54
-var kvalue = 4
-var dvalue = 3
-var delaybetweenorder = 0.5 //sec
-var takeProfit = 4.5 //%
-var stopLoss = -6.5 //%
-var min_withdrawal_percent = 0.025 // when bot profits 5%, withdraw 2.5%
+var lowRSI = parseFloat(process.env.lowRSI)
+var highRSI = parseFloat(process.env.highRSI)
+var minCross = parseFloat(process.env.minCross)
+var useMFI = (process.env.useMFI)
+if (useMFI == 'true'){
+	useMFI = true;
+}
+else {
+	useMFI = false;
+}
+var rsiTF = parseFloat(process.env.rsiTF)
+var mfiTF = parseFloat(process.env.mfiTF)
+var period = parseFloat(process.env.period)
+var kvalue = parseFloat(process.env.kvalue)
+var dvalue = parseFloat(process.env.dvalue)
+var delaybetweenorder =parseFloat(process.env.delaybetweenorder)
+var takeProfit = parseFloat(process.env.takeProfit)
+var stopLoss = parseFloat(process.env.stopLoss)
+var key = (process.env.key)
+var secret = (process.env.secret)
+var min_withdrawal_percent = parseFloat(process.env.min_withdrawal_percent)
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var client = new ccxt.binance(
-            {"apiKey": "yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL",
-            "secret": "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4",
+            {"apiKey": key,
+            "secret": secret,
             "options":{"defaultMarket":"futures"}, 'enableRateLimit': true,
             'urls': {'api': {
                                      'public': 'https://fapi.binance.com/fapi/v1',
                                      'private': 'https://fapi.binance.com/fapi/v1',},}
  })
 const binance = require('node-binance-api')().options({
-  APIKEY: 'yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL',
-  APISECRET: 'v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4',
+  APIKEY: key,
+  APISECRET: secret,
   useServerTime: true // If you get timestamp errors, synchronize to server time at startup
 });
 
