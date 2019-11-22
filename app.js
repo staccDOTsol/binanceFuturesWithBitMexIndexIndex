@@ -77,12 +77,12 @@ async function cancelall(){
 
         for (var order in ords){
         	if (true){
-            oid = ords[order] ['info'] ['orderId']
+            oid = ords[order] ['id']
             side = ords[order]['side']
             //if (buysell == 1 && side == 'buy'){
             //	console.log('cancelleing2...')
             try{
-                await client2.cancelOrder( oid , 'BTC/USDT' )
+                await client.cancelOrder( oid , 'BTC/USDT' )
             }
             catch (e){
                 console.log(e)
