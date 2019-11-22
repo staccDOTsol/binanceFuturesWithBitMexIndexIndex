@@ -121,7 +121,7 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm'
 			rsis[0].shift()
 		}
 		}
-	ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 74, params = {})
+	ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 74, params = {})
 //console.log(ohlcv)
 	high = []
 	low = []
@@ -246,7 +246,7 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm'
 		}
 		}
 theRSI = RSI.calculate({ rsiPeriod : 14, stochasticPeriod: 14, kPeriod: 3, dPeriod: 3,values : rsis[0]});
-console.log(theRSI[theRSI.length-1].k)
+//console.log(theRSI[theRSI.length-1].k)
 ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 17, params = {})
 high = []
 	low = []
