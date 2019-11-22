@@ -79,7 +79,7 @@ async function cancelall(){
             //if (buysell == 1 && side == 'buy'){
             //	console.log('cancelleing2...')
             try{
-                await client.cancelOrder( oid , 'BTC/USDT' )
+                await client2.cancelOrder( oid , 'BTC/USDT' )
             }
             catch (e){
                 console.log(e)
@@ -246,8 +246,8 @@ ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = rsiTF.toString() + 'm'
 		}
 		}
 theRSI = RSI.calculate({ rsiPeriod : 14, stochasticPeriod: 14, kPeriod: 3, dPeriod: 3,values : rsis[0]});
-
-ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = '1m', since = undefined, limit = 17, params = {})
+console.log(theRSI[theRSI.length-1].k)
+ohlcv = await client2.fetchOHLCV ('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 17, params = {})
 high = []
 	low = []
 	close = []
