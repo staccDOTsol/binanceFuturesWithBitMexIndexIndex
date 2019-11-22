@@ -414,7 +414,7 @@ async function doit(){
 	}
 	diff = price / index; 
 	diff = -1 * (1-diff) * 100 
-	if(diff < -1 * minCross / 1.5 && rsiover && (useMFI && mfiover)){
+	if(diff < -1 * minCross / 1.5 && rsiover){
 		if (selling == 0 && (freePerc < 1 || position > 0)){
 			//selling = 1;
 			buysell = 0;
@@ -439,7 +439,7 @@ async function doit(){
 		}
 	}
 
-	else if (diff > minCross && diff < 100000 && rsibelow && (useMFI && mfibelow)){
+	else if (diff > minCross && diff < 100000 && rsibelow){
 		if (buying == 0 && (freePerc < 1 || position < 0)){
 			//selling = 0;
 			//buying = 1;
