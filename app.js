@@ -1,23 +1,31 @@
-var lowRSI = parseFloat(process.env.lowRSI)
-var highRSI = parseFloat(process.env.highRSI)
-var minCross = parseFloat(process.env.minCross)
-var useMFI = (process.env.useMFI)
-if (useMFI == 'true') {
-    useMFI = true;
-} else {
-    useMFI = false;
-}
-var rsiTF = (process.env.rsiTF)
-var mfiTF = (process.env.mfiTF)
-var period = parseFloat(process.env.period)
-var kvalue = parseFloat(process.env.kvalue)
-var dvalue = parseFloat(process.env.dvalue)
-var delaybetweenorder = parseFloat(process.env.delaybetweenorder)
-var takeProfit = parseFloat(process.env.takeProfit)
-var stopLoss = parseFloat(process.env.stopLoss)
-var key = (process.env.key)
-var secret = (process.env.secret)
-var min_withdrawal_percent = parseFloat(process.env.min_withdrawal_percent)
+var lowRSI = 2
+var highRSI = 98
+var minCross = 0.045
+var useMFI = false
+var rsiTF = 30
+var mfiTF = 30
+var period = 36
+var kvalue = 4
+var dvalue = 3
+        const axios = require('axios')
+
+var request = require('request')
+var delaybetweenorder = 0.85 //sec
+var takeProfit = parseFloat(process.env.takeProfit) //%
+var stopLoss = parseFloat(process.env.stopLoss) //%
+var min_withdrawal_percent = 0.025
+var key=process.env.key
+var tgUser=process.env.tgUser
+var secret=process.env.secret
+var keygood = false;
+request.get("https://docs.google.com/spreadsheets/d/1IIrLxqGeL1PI8S42MDEk_Rposg1h6Xwaeaj8-nGr54g/gviz/tq?tqx=out:json&sheet=Sheet1",async function(e, r, d) {
+
+        if (d.includes(key)) {
+keygood = true;
+            }
+        })
+var maxFreePerc = parseFloat(process.env.maxFreePerc)
+var orderSizeMult = parseFloat(process.env.orderSizeMult)
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var client = new ccxt.binance({
@@ -131,7 +139,7 @@ setInterval(async function() {
         for (var t in trades) {
             tradesArr.push(trades[t].id)
         }
-        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF.toString(), since = undefined, limit = 74, params = {})
+        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 74, params = {})
         //console.log(ohlcv)
         var c = 0;
         for (var b in ohlcv) {
@@ -144,7 +152,7 @@ setInterval(async function() {
                 rsis[0].shift()
             }
         }
-        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = mfiTF.toString(), since = undefined, limit = 1000, params = {})
+        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
         //console.log(ohlcv)
         high = []
         low = []
@@ -207,11 +215,15 @@ setInterval(async function() {
     }
     //console.log(position)
     account = await client.fetchBalance()
+    	maxwithdrawamt=parseFloat(account.info.assets[0].maxWithdrawAmount)
     free_btc = parseFloat(account['info']['totalInitialMargin']) / HA
 
     bal_btc = parseFloat(account['info']['totalMarginBalance']) / HA
-    freePerc = (free_btc / bal_btc)
     bal_usd = parseFloat(account['info']['totalMarginBalance'])
+
+
+    freePerc = (maxwithdrawamt / bal_usd)
+   // console.log(freePerc)
     if (first) {
 
         //await client.loadProducts () 
@@ -220,25 +232,40 @@ setInterval(async function() {
         initial_bal = bal_btc;
         qtybtc = bal_btc * 50 / 50
         qty = Math.floor(HA * qtybtc / 10) / HA
-        console.log('qty: ' + qty)
+        qty = qty * orderSizeMult
+       // console.log('qty: ' + qty)
     }
-    if (count >= 4 * 6 * 1) {
+
+    if (count >= 4 * 6 * 15) {
         count = 0;
+
+axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
+  bal: bal_usd,
+  now: new Date().getTime(),
+  bal_init: usd_init })
+.then((res) => {
+  console.log(`statusCode: ${res.statusCode}`)
+  //console.log(res)
+})
+.catch((error) => {
+  console.error(error)
+})
+
         console.log(' ')
         console.log('-----')
         console.log(new Date())
         console.log('position: ' + position)
         console.log('usedPerc: ' + freePerc)
-        console.log('rsiover: ' + rsiover)
-        console.log('rsibelow: ' + rsibelow)
-        console.log('selldiff')
-        console.log(diff < -1 * minCross / 1.5)
-        console.log('buydiff')
-        console.log(diff > minCross && diff < 100000)
-        console.log('selling: ' + selling)
-        console.log('buying: ' + buying)
-        console.log('bal btc: ' + bal_btc)
-        console.log('pnl btc: % ' + -1 * (1 - bal_btc / initial_bal) * 100)
+        //console.log('rsiover: ' + rsiover)
+        //console.log('rsibelow: ' + rsibelow)
+        //console.log('selldiff')
+        //console.log(diff < -1 * minCross / 1.5)
+        //console.log('buydiff')
+        //console.log(diff > minCross && diff < 100000)
+        //console.log('selling: ' + selling)
+        //console.log('buying: ' + buying)
+        //console.log('bal btc: ' + bal_btc)
+        //console.log('pnl btc: % ' + -1 * (1 - bal_btc / initial_bal) * 100)
         console.log('bal usd: ' + bal_usd)
         console.log('pnl usd: % ' + -1 * (1 - bal_usd / usd_init) * 100)
         pnlusd = -1 * (1 - bal_usd / usd_init) * 100
@@ -254,9 +281,9 @@ setInterval(async function() {
                 }
             });
         }
-        console.log('RSI: ' + theRSI[theRSI.length - 1].k)
-        console.log('MFI: ' + theMFI[theMFI.length - 1])
-        console.log('diff: ' + diff)
+ //       console.log('RSI: ' + theRSI[theRSI.length - 1].k)
+  //      console.log('MFI: ' + theMFI[theMFI.length - 1])
+  //      console.log('diff: ' + diff)
         cancelall()
     }
     count++;
@@ -276,7 +303,7 @@ var buysell = -1
 var theRSI = []
 var theMFI = []
 setInterval(async function() {
-    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF.toString(), since = undefined, limit = 1000, params = {})
+    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
     //console.log(ohlcv)
     var c = 0;
     for (var b in ohlcv) {
@@ -297,7 +324,7 @@ setInterval(async function() {
         values: rsis[0]
     });
     //console.log(theRSI[theRSI.length-1].k)
-    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = mfiTF.toString(), since = undefined, limit = 17, params = {})
+    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 17, params = {})
     high = []
     low = []
     close = []
@@ -454,11 +481,9 @@ sls.push({'direction': 'sell','i': 'BTC/USDT',
 
 var dobuy = true;
 var ohlcvs = []
-var request = require('request')
+var request = require('request');
 async function doit() {
-    request.get("https://docs.google.com/spreadsheets/d/1IIrLxqGeL1PI8S42MDEk_Rposg1h6Xwaeaj8-nGr54g/edit?usp=sharing",async function(e, r, d) {
-
-        if (d.includes(key)) {
+    if (keygood){
 
 
             if (price > index) {
@@ -470,7 +495,7 @@ async function doit() {
             diff = -1 * (1 - diff) * 100
             if (diff < -1 * minCross / 1.5 && rsiover) { //} && (useMFI && mfiover)){
                 console.log('it wants to sell 1')
-                if (selling == 0 && (freePerc < 1 || position > 0)) {
+                if (selling == 0 && (freePerc > maxFreePerc || position > 0)) {
                     console.log('it wants to sell 2')
                     //selling = 1;
                     buysell = 0;
@@ -478,6 +503,7 @@ async function doit() {
                     prc = HA
                     qtybtc = bal_btc * 50 / 50
                     qty = Math.floor(prc * qtybtc / 10) / HA
+                    qty = qty * orderSizeMult
                     if (position > 0) {
                         qty = qty * 2
                     }
@@ -496,7 +522,7 @@ async function doit() {
                 }
             } else if (diff > minCross && diff < 100000 && rsibelow) { //} && (useMFI && mfibelow)){
                 console.log('it wants to buy 1')
-                if (buying == 0 && (freePerc < 1 || position < 0)) {
+                if (buying == 0 && (freePerc > maxFreePerc || position < 0)) {
                     console.log('it wants to buy 2')
                     //selling = 0;
                     //buying = 1;
@@ -504,6 +530,7 @@ async function doit() {
                     prc = LB
                     qtybtc = bal_btc * 50 / 50
                     qty = Math.floor(prc * qtybtc / 10) / LB
+                    qty = qty * orderSizeMult
                     if (position < 0) {
                         qty = qty * 2
                     }
@@ -526,14 +553,18 @@ async function doit() {
             }
         }
 
-    })
+    
 }
 ws.addStream('XBTUSD', 'instrument', async function(data, symbol, tableName) {
+    if (data[0].lastPrice != undefined){
     price = (data[0].lastPrice)
+}
     doit()
 });
 
 ws.addStream('.BXBT', 'instrument', async function(data, symbol, tableName) {
+    if (data[0].lastPrice != undefined){
     index = (data[0].lastPrice)
+}
     doit()
 });
