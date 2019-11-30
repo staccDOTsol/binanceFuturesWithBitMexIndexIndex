@@ -28,6 +28,7 @@ var maxFreePerc = parseFloat(process.env.maxFreePerc)
 var orderSizeMult = parseFloat(process.env.orderSizeMult)
 var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
+var bitmex = new ccxt.bitmex()
 var client = new ccxt.binance({
     "apiKey": key,
     "secret": secret,
@@ -555,6 +556,17 @@ async function doit() {
 
     
 }
+setInterval(async function(){
+ticker1 = await bitmex.fetchTicker('BTC/USD')
+price = ticker1.lastPrice
+request.get('https://www.bitmex.com/api/v1/instrument?symbol=.BXBT', function (e, r, d){
+
+j = JSON.parse(d)[0].lastPrice
+console.log(j)
+index=j
+})
+}, 1000)
+/*
 ws.addStream('XBTUSD', 'instrument', async function(data, symbol, tableName) {
     if (data[0].lastPrice != undefined){
     price = (data[0].lastPrice)
@@ -568,3 +580,4 @@ ws.addStream('.BXBT', 'instrument', async function(data, symbol, tableName) {
 }
     doit()
 });
+*/

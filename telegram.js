@@ -57,7 +57,8 @@ app.post("/start_bot2", function(req, res) {
 	console.log("startbot");
 const { message } = req.body;
 let reply = "";
-if (message.text != undefined){
+if (message != undefined){
+	if (message.text != undefined){
 if (message.text.toLowerCase().indexOf("statusupdate") != -1){
 	if (message.text.split(' ').length > 0){
 	var b = message.text.split(' ')[1]
@@ -91,7 +92,7 @@ if (message.text.toLowerCase().indexOf("statusupdate") != -1){
 	}
 
 }
-
+}
 	else {
 		res.send('ok')
 	}
