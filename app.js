@@ -557,17 +557,26 @@ async function doit() {
     
 }
 setInterval(async function(){
-setTimeout(async function(){
-ticker1 = await bitmex.fetchTicker('BTC/USD')
-price = ticker1.lastPrice
-}, 4000)
-request.get('https://www.bitmex.com/api/v1/instrument?symbol=.BXBT', function (e, r, d){
+//ticker1 = await bitmex.fetchTicker('BTC/USD')
+
+//price = ticker1.lastPrice
+//index=(ticker1.markPrice)
+
+
+request.get('https://www.bitmex.com/api/v1/instrument?symbol=XBTUSD', function (e, r, d){
 
 j = JSON.parse(d)[0].lastPrice
+
+j2 = JSON.parse(d)[0].markPrice
 console.log(j)
-index=j
+price=j
+index=j2
 })
-}, 8000)
+}, 4000)
+/*setInterval(function(){
+    console.log(index)
+    console.log(price)
+}, 500) */
 /*
 ws.addStream('XBTUSD', 'instrument', async function(data, symbol, tableName) {
     if (data[0].lastPrice != undefined){
