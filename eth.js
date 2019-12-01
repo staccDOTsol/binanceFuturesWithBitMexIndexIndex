@@ -561,17 +561,17 @@ setTimeout(async function(){
 ticker1 = await bitmex.fetchTicker('ETH/USD')
 price = ticker1.lastPrice
 
-}, 2000)
+}, 4000)
 request.get('https://www.bitmex.com/api/v1/instrument?symbol=.BETH', function (e, r, d){
 
 j = JSON.parse(d)[0].lastPrice
 console.log(j)
 index=j
 })
-}, 4000)
+}, 8000)
 /*
 ws.addStream('XBTUSD', 'instrument', async function(data, symbol, tableName) {
-    if (data[0].lastPrice != undefined){
+    if (data[0].lastPrice != undefined){1
     price = (data[0].lastPrice)
 }
     doit()

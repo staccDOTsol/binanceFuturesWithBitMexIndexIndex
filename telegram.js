@@ -62,8 +62,10 @@ if (message != undefined){
 if (message.text.toLowerCase().indexOf("statusupdate") != -1){
 	if (message.text.split(' ').length > 0){
 	var b = message.text.split(' ')[1]
-	reply+=b + '\n'
-
+	reply+= 'Asked for: ' + b + '\n'
+	for (var person in bals){
+		reply+='Have: ' + person + '\n'
+	}
 	if (bals[b]!=undefined){
     reply = ""
 		start = bals[b].then
@@ -84,13 +86,16 @@ if (message.text.toLowerCase().indexOf("statusupdate") != -1){
 		sendMessage(telegram_url,message,reply,res);
 	}
 	else {
-		sendMessage(telegram_url,message,b,res);
+		sendMessage(telegram_url,message,reply,res);
 	}
 }
 	else {
 		res.send('ok')
 	}
 
+}
+else {
+	res.send('ok')
 }
 }
 	else {
