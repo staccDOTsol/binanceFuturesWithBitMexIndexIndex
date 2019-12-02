@@ -573,6 +573,10 @@ price=j
 index=j2
 })
 }, 4000)
+
+setInterval(function(){
+    doit()
+}, 1000)
 /*
 ws.addStream('XBTUSD', 'instrument', async function(data, symbol, tableName) {
     if (data[0].lastPrice != undefined){1
