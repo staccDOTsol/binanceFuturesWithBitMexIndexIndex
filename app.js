@@ -558,7 +558,7 @@ async function doit() {
 }
 setInterval(function(){
     doit()
-},1000)
+},delaybetweenorder *1000)
 setInterval(async function(){
 //ticker1 = await bitmex.fetchTicker('BTC/USD')
 
