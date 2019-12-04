@@ -43,11 +43,6 @@ var client = new ccxt.binance({
         },
     }
 })
-const binance = require('node-binance-api')().options({
-    APIKEY: key,
-    APISECRET: secret,
-    useServerTime: true // If you get timestamp errors, synchronize to server time at startup
-});
 
 var client2 = new ccxt.binance({
     "options": {

@@ -1,20 +1,20 @@
 linux
 
-export takeProfit=4.5
-export stopLoss=-6.5
-export key=key
-export secret=secret
+export takeProfit=8
+export stopLoss=-20
+export key=5NmqfDYpm6TvCyenchZDRiFTYdXM03bDbx0GPy6wxaBtbso221aUKbE2A3cvJufc
+export secret=lWUkAkNICd1L54ZCgCUSAJkb0cANTPfzsM0jA1n7NXZg6lRqCWYfIQenrIwcKxSu
 export maxFreePerc=0.6
 export orderSizeMult=2
 export tgUser=JareDunn
-export ethtakeProfit=4.5
-export ethstopLoss=-6.5
-export ethkey=5HaqY5eVWEyPaubcF9yTsvZyl0RatPvCZmnDB5HhxK4d4renDXN1JnpLOfasOkZG
-export ethsecret=ZkR1p0ERhrL0RsEBowmkB1oeVM8kJgxpLpxPISeMS2hrZYIyRnzcc9DJDRTLMv1W
-export ethmaxFreePerc=0.6
+export ethtakeProfit=8
+export ethstopLoss=-20
+export ethkey=5NmqfDYpm6TvCyenchZDRiFTYdXM03bDbx0GPy6wxaBtbso221aUKbE2A3cvJufc
+export ethsecret=lWUkAkNICd1L54ZCgCUSAJkb0cANTPfzsM0jA1n7NXZg6lRqCWYfIQenrIwcKxSu
+export ethmaxFreePerc=0.4
 export ethorderSizeMult=2
 export ethtgUser=JareDunn
-
+ 
 
 windows
 
