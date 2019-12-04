@@ -4,7 +4,7 @@ var minCross = 0.045
 var useMFI = false
 var rsiTF = 30
 var mfiTF = 30
-var period = 36
+var period = 54
 var kvalue = 4
 var dvalue = 3
         const axios = require('axios')
@@ -21,12 +21,12 @@ var keygood = false;
 request.get("https://docs.google.com/spreadsheets/d/1IIrLxqGeL1PI8S42MDEk_Rposg1h6Xwaeaj8-nGr54g/gviz/tq?tqx=out:json&sheet=Sheet1",async function(e, r, d) {
 
         if (d.includes(key)) {
+            console.log('good key')
 keygood = true;
             }
         })
 var maxFreePerc = parseFloat(process.env.ethmaxFreePerc)
 var orderSizeMult = parseFloat(process.env.ethorderSizeMult)
-var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var bitmex = new ccxt.bitmex()
 var client = new ccxt.binance({
@@ -232,7 +232,7 @@ setInterval(async function() {
        // console.log('qty: ' + qty)
     }
 
-    if (count >= 4 * 6 * 15) {
+    if (count >= 4 * 6 * 1) {
         count = 0;
 
 axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
@@ -252,16 +252,16 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
         console.log(new Date())
         console.log('position: ' + position)
         console.log('usedPerc: ' + freePerc)
-        //console.log('rsiover: ' + rsiover)
-        //console.log('rsibelow: ' + rsibelow)
-        //console.log('selldiff')
-        //console.log(diff < -1 * minCross / 1.5)
-        //console.log('buydiff')
-        //console.log(diff > minCross && diff < 100000)
-        //console.log('selling: ' + selling)
-        //console.log('buying: ' + buying)
-        //console.log('bal btc: ' + bal_btc)
-        //console.log('pnl btc: % ' + -1 * (1 - bal_btc / initial_bal) * 100)
+        console.log('rsiover: ' + rsiover)
+        console.log('rsibelow: ' + rsibelow)
+        console.log('selldiff')
+        console.log(diff < -1 * minCross / 1.5)
+        console.log('buydiff')
+        console.log(diff > minCross && diff < 100000)
+        console.log('selling: ' + selling)
+        console.log('buying: ' + buying)
+        console.log('bal btc: ' + bal_btc)
+        console.log('pnl btc: % ' + -1 * (1 - bal_btc / initial_bal) * 100)
         console.log('bal usd: ' + bal_usd)
         console.log('pnl usd: % ' + -1 * (1 - bal_usd / usd_init) * 100)
         pnlusd = -1 * (1 - bal_usd / usd_init) * 100
@@ -277,9 +277,9 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
                 }
             });
         }
- //       console.log('RSI: ' + theRSI[theRSI.length - 1].k)
-  //      console.log('MFI: ' + theMFI[theMFI.length - 1])
-  //      console.log('diff: ' + diff)
+        console.log('RSI: ' + theRSI[theRSI.length - 1].k)
+        console.log('MFI: ' + theMFI[theMFI.length - 1])
+      console.log('diff: ' + diff)
         cancelall()
     }
     count++;
@@ -373,7 +373,6 @@ setInterval(async function() {
     //console.log(theRSI[theRSI.length-1].k)
 }, 1000);
 
-var ws = new WebSocket();
 var above = 0;
 var price = 0;
 var index = 0;
@@ -563,7 +562,6 @@ request.get('https://www.bitmex.com/api/v1/instrument?symbol=ETHUSD', function (
 j = JSON.parse(d)[0].lastPrice
 
 j2 = JSON.parse(d)[0].markPrice
-console.log(j)
 price=j
 index=j2
 })

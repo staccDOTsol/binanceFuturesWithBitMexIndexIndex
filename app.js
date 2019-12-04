@@ -4,7 +4,7 @@ var minCross = 0.045
 var useMFI = false
 var rsiTF = 30
 var mfiTF = 30
-var period = 36
+var period = 54
 var kvalue = 4
 var dvalue = 3
         const axios = require('axios')
@@ -26,7 +26,6 @@ keygood = true;
         })
 var maxFreePerc = parseFloat(process.env.maxFreePerc)
 var orderSizeMult = parseFloat(process.env.orderSizeMult)
-var WebSocket = require('bitmex-realtime-api');
 const ccxt = require('ccxt')
 var bitmex = new ccxt.bitmex()
 var client = new ccxt.binance({
@@ -231,7 +230,7 @@ setInterval(async function() {
        // console.log('qty: ' + qty)
     }
 
-    if (count >= 4 * 6 * 15) {
+    if (count >= 4 * 6 * 1) {
         count = 0;
 
 axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
@@ -372,7 +371,6 @@ setInterval(async function() {
     //console.log(theRSI[theRSI.length-1].k)
 }, 1000);
 
-var ws = new WebSocket();
 var above = 0;
 var price = 0;
 var index = 0;
@@ -565,7 +563,6 @@ request.get('https://www.bitmex.com/api/v1/instrument?symbol=XBTUSD', function (
 j = JSON.parse(d)[0].lastPrice
 
 j2 = JSON.parse(d)[0].markPrice
-console.log(j)
 price=j
 index=j2
 })
