@@ -5,6 +5,8 @@ export stopLoss=-6.5
 export ethdelaybetweenorder=0.5
 export ethtakeProfit=4.5
 export ethstopLoss=-6.5
+export ethtgUser=JareDunn
+export tgUser=JareDunn
 export key=
 export secret=
 export ethkey=
@@ -14,6 +16,9 @@ export port=8080
 
 windows
 
+
+setx ethtgUser "JareDunn"
+setx tgUser "JareDunn"
 setx delaybetweenorder "0.5"
 setx takeProfit "4.5"
 setx stopLoss "-6.5"
