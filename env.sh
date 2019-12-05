@@ -1,34 +1,35 @@
 linux
 
-export takeProfit=8
-export stopLoss=-20
-export key=5NmqfDYpm6TvCyenchZDRiFTYdXM03bDbx0GPy6wxaBtbso221aUKbE2A3cvJufc
-export secret=lWUkAkNICd1L54ZCgCUSAJkb0cANTPfzsM0jA1n7NXZg6lRqCWYfIQenrIwcKxSu
-export maxFreePerc=0.6
-export orderSizeMult=2
-export tgUser=JareDunn
-export ethtakeProfit=8
-export ethstopLoss=-20
-export ethkey=5NmqfDYpm6TvCyenchZDRiFTYdXM03bDbx0GPy6wxaBtbso221aUKbE2A3cvJufc
-export ethsecret=lWUkAkNICd1L54ZCgCUSAJkb0cANTPfzsM0jA1n7NXZg6lRqCWYfIQenrIwcKxSu
-export ethmaxFreePerc=0.4
-export ethorderSizeMult=2
-export ethtgUser=JareDunn
- 
+export lowRSI=20
+export highRSI=65
+export minCross=0.03
+export useMFI=true
+export rsiTF=5
+export mfiTF=15
+export period=54
+export kvalue=4
+export dvalue=3
+export delaybetweenorder=0.5
+export takeProfit=4.5
+export stopLoss=-6.5
+export key=yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL
+export secret=v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4
+export min_withdrawal_percent=0.025 
 
 windows
 
-setx takeProfit="4.5"
-setx stopLoss="-6.5"
-setx key="key"
-setx secret="secret"
-setx maxFreePerc="0.6"
-setx orderSizeMult="2"
-setx tgUser="JareDunn"
-setx ethtakeProfit="4.5"
-setx ethstopLoss="-6.5"
-setx ethkey="key"
-setx ethsecret="secret"
-setx ethmaxFreePerc="0.6"
-setx ethorderSizeMult="2"
-setx ethtgUser="JareDunn"
+setx lowRSI "20"
+setx highRSI "65"
+setx minCross "0.03"
+setx useMFI "true"
+setx rsiTF "5"
+setx mfiTF "15"
+setx period "54"
+setx kvalue "4"
+setx dvalue "3"
+setx delaybetweenorder "0.5"
+setx takeProfit "4.5"
+setx stopLoss "-6.5"
+setx key "yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL"
+setx secret "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4"
+setx min_withdrawal_percent "0.025"
