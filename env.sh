@@ -13,7 +13,10 @@ export ethkey=
 export ethsecret=
 export site=http://coindexbot.duckdns.org
 export port=8080
-
+export maxFreePerc=0.9
+export ethmaxFreePerc=0.9
+export orderSizeMult=1
+export ethorderSizeMult=1
 windows
 
 
@@ -31,3 +34,8 @@ setx ethkey ""
 setx ethsecret ""
 setx site "http://coindexbot.duckdns.org"
 setx port "8080"
+
+setx maxFreePerc "0.9"
+setx ethmaxFreePerc "0.9"
+setx orderSizeMult "1"
+setx ethorderSizeMult "1"
