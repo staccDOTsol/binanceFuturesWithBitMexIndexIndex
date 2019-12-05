@@ -1,7 +1,7 @@
 
 const binance = require('node-binance-api')().options({
-  APIKEY: "yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL",
-  APISECRET: "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4",
+  APIKEY:process.env.key,
+  APISECRET: process.env.secret,
   useServerTime: true // If you get timestamp errors, synchronize to server time at startup
 });
 
@@ -10,16 +10,16 @@ const binance = require('node-binance-api')().options({
 var btc = 0;
 const ccxt = require('ccxt')
 var client = new ccxt.binance(
-            {"apiKey": "yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL",
-            "secret": "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4",
+            {"apiKey": process.env.key,
+            "secret":process.env.secret,
             "options":{"defaultMarket":"futures"},
             'urls': {'api': {
                                      'public': 'https://fapi.binance.com/fapi/v1',
                                      'private': 'https://fapi.binance.com/fapi/v1',},}
  })
 var client2 = new ccxt.binance(
-            {"apiKey": "yUJluobNfQ5H1nQ9Cp3czdmHL27Wz8I61E1b7tsR2hMYApLCbPbeezvtQWj2D2NL",
-            "secret": "v0BwW14iRs91eppXZYsrqUxYdYTxpWotJNPgpkcph6N3q9mmMOi23BlQrBwSBKZ4",
+            {"apiKey": process.env.key,
+            "secret": process.env.secret,
             })
 var btcstart = 0
 var btcs = []
@@ -64,7 +64,7 @@ app.use(cors());
 var request = require("request")
 var bodyParser = require('body-parser')
 app.set('view engine', 'ejs');
-app.listen(process.env.PORT || 8081, function() {});
+app.listen(parseFloat(process.env.port) || 8081, function() {});
 app.get('/update', cors(), (req, res) => {
 if (btc != 0){
 btcs.push( [new Date().getTime(), -1 * (1-(btc / btcstart)) * 100])
@@ -75,7 +75,9 @@ btcs.push( [new Date().getTime(), -1 * (1-(btc / btcstart)) * 100])
 
 app.get('/', (req, res) => {
         res.render('index.ejs', {
-            btc: btc
+            btc: btc,
+            site: process.env.site,
+            port: process.env.port
         })
 
 });
