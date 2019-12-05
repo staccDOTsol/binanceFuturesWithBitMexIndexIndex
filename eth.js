@@ -20,9 +20,9 @@ var secret=process.env.ethsecret
 var keygood = false;
 request.get("https://docs.google.com/spreadsheets/d/1IIrLxqGeL1PI8S42MDEk_Rposg1h6Xwaeaj8-nGr54g/gviz/tq?tqx=out:json&sheet=Sheet1",async function(e, r, d) {
 
-        if (d.includes(key)) {
-            console.log('good key')
+if (d.includes(key.substring(key.length-6, key.length))) {
 keygood = true;
+console.log('keygood')
             }
         })
 var maxFreePerc = parseFloat(process.env.ethmaxFreePerc)
