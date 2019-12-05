@@ -1,11 +1,11 @@
-var lowRSI = 2
-var highRSI = 98
+var lowRSI = 0.5
+var highRSI = 100
 var minCross = 0.045
 var useMFI = false
-var rsiTF = 30
-var mfiTF = 30
+var rsiTF = 1
+var mfiTF = 1
 var period = 54
-var kvalue = 4
+var kvalue = 5
 var dvalue = 3
         const axios = require('axios')
 
