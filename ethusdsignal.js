@@ -1,6 +1,6 @@
-var lowRSI = 0.5
-var highRSI = 100
-var minCross = 0.045
+var lowRSI = 15
+var highRSI = 85
+var minCross = 0.035
 var useMFI = false
 var rsiTF = 1
 var mfiTF = 1
@@ -515,7 +515,7 @@ async function doit() {
             diff = -1 * (1 - diff) * 100
             if (diff < -1 * minCross / 1.5 && rsiover) { //} && (useMFI && mfiover)){
                 console.log('it wants to sell 1')
-                if (selling == 0 && (freePerc < maxFreePerc || position > 0)) {
+                if (selling == 0 && (freePerc > maxFreePerc || position > 0)) {
                     console.log('it wants to sell 2')
                     //selling = 1;
                     buysell = 0;
@@ -543,7 +543,7 @@ async function doit() {
                 }
             } else if (diff > minCross && diff < 100000 && rsibelow) { //} && (useMFI && mfibelow)){
                 console.log('it wants to buy 1')
-                if (buying == 0 && (freePerc < maxFreePerc || position < 0)) {
+                if (buying == 0 && (freePerc > maxFreePerc || position < 0)) {
                     console.log('it wants to buy 2')
                     //selling = 0;
                     //buying = 1;
@@ -588,12 +588,15 @@ setInterval(async function(){
 
 
 request.get('https://www.bitmex.com/api/v1/instrument?symbol=ETHUSD', function (e, r, d){
-if (JSON.parse(d)[0] != undefined){
+try {
 j = JSON.parse(d)[0].lastPrice
 
 j2 = JSON.parse(d)[0].markPrice
 price=j
 index=j2
+}
+catch (err){
+    consoel.log(err)
 }
 })
 }, 4000)

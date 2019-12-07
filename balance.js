@@ -55,6 +55,10 @@ first = false;
 }
 console.log(btcstart)
 console.log(btc)
+if (btc != 0){
+btcs.push( [new Date().getTime(), -1 * (1-(btc / btcstart)) * 100])
+bals.push([new Date().getTime(), btc])
+}
 }, 1500)
 
 const express = require('express');
@@ -66,10 +70,8 @@ var bodyParser = require('body-parser')
 app.set('view engine', 'ejs');
 app.listen(parseFloat(process.env.port) || 8081, function() {});
 app.get('/update', cors(), (req, res) => {
-if (btc != 0){
-btcs.push( [new Date().getTime(), -1 * (1-(btc / btcstart)) * 100])
-}
-    res.json({btc: btcs, qty: vol, pos: position})
+
+    res.json({bal: bals, btc: btcs, qty: vol, pos: position})
 
 })
 
@@ -81,3 +83,4 @@ app.get('/', (req, res) => {
         })
 
 });
+var bals = []

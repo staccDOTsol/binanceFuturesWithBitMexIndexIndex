@@ -78,16 +78,17 @@
                 start = jsondata.btc[0][0]
                 dds = {}
                 a = -1
-                for (var t =0; t<=jsondata.btc.length; t = t + 5){
-                d = jsondata.btc[t][0]
+                for (var t =0; t<=jsondata.bal.length; t = t + 5){
+                d = jsondata.bal[t][0]
                 tf = d - 1000 * 60 * 60 * 24
                 a++
-                for (var btc  = 0; btc <= jsondata.btc.length; btc = btc + 5){
-                if (jsondata.btc[btc][0] > tf && jsondata.btc[btc][0] < d){
+                for (var btc  = 0; btc <= jsondata.bal.length; btc = btc + 5){
+                if (jsondata.bal[btc][0] > tf && jsondata.bal[btc][0] < d){
                 if (dds[a] == undefined){
                 dds[a] = []
                 }
-                    dds[a].push(jsondata.btc[btc][1])
+                    dds[a].push((jsondata.bal[btc][1].toFixed(20)))
+                
                 
                 }
                 }
