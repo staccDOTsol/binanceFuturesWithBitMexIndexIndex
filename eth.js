@@ -1,12 +1,13 @@
-var lowRSI = 0.5
-var highRSI = 100
-var minCross = 0.045
+var lowRSI = 3.5
+var highRSI = 99
+var minCross = 0.0025
 var useMFI = false
 var rsiTF = 1
 var mfiTF = 1
 var period = 54
 var kvalue = 5
 var dvalue = 3
+
         const axios = require('axios')
 
 var request = require('request')
@@ -558,12 +559,16 @@ setInterval(async function(){
 
 
 request.get('https://www.bitmex.com/api/v1/instrument?symbol=ETHUSD', function (e, r, d){
-
+try {
 j = JSON.parse(d)[0].lastPrice
 
 j2 = JSON.parse(d)[0].markPrice
 price=j
 index=j2
+}
+catch (err){
+    consoel.log(err)
+}
 })
 }, 4000)
 

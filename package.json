@@ -11,7 +11,8 @@
     "body-parser": "*",
     "express": "*",
     "request": "^2.88.0",
-    "requests": "^0.3.0"
+    "requests": "^0.3.0",
+    "socket.io-client": "^2.3.0"
   },
   "license": "MIT"
 }
