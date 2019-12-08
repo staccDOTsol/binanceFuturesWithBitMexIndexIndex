@@ -513,7 +513,7 @@ async function doit() {
             diff = -1 * (1 - diff) * 100
             if (diff < -1 * minCross / 1.5 && rsiover) { //} && (useMFI && mfiover)){
                 console.log('it wants to sell 1')
-                if (selling == 0 && (freePerc < maxFreePerc || position > 0)) {
+                if (selling == 0){// && (freePerc < maxFreePerc || position > 0)) {
                     console.log('it wants to sell 2')
                     //selling = 1;
                     buysell = 0;
@@ -540,7 +540,7 @@ async function doit() {
                 }
             } else if (diff > minCross && diff < 100000 && rsibelow) { //} && (useMFI && mfibelow)){
                 console.log('it wants to buy 1')
-                if (buying == 0 && (freePerc < maxFreePerc || position < 0)) {
+                if (buying == 0){// && (freePerc < maxFreePerc || position < 0)) {
                     console.log('it wants to buy 2')
                     //selling = 0;
                     //buying = 1;
