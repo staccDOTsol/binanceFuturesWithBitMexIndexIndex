@@ -17,11 +17,11 @@ async function getVars(){
 request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
     try {
         j = JSON.parse(d)
-        lowRSI = j.lowRSI
-        highRSI = j.highRSI
-        minCross = j.minCross
-        rsiTF = j.RSItf 
-        period = j.RSIPeriod 
+        lowRSI = parseFloat(j.lowRSI)
+        highRSI = parseFloat(j.highRSI)
+        minCross = parseFloat(j.minCross)
+        rsiTF = parseFloat(j.RSItf)
+        period = parseFloat(j.RSIPeriod) 
     }
     catch (err){
         console.log(err)
