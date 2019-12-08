@@ -7,10 +7,31 @@ var mfiTF = 1
 var period = 54
 var kvalue = 5
 var dvalue = 3
-
         const axios = require('axios')
 
 var request = require('request')
+
+async function getVars(){
+
+request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
+    try {
+        j = JSON.parse(d)
+        lowRSI = j.lowRSI
+        highRSI = j.highRSI
+        minCross = j.minCross
+        rsiTF = j.RSItf 
+        period = j.RSIPeriod 
+    }
+    catch (err){
+        console.log(err)
+    }
+})
+
+}
+getVars()
+setInterval(async function(){
+getVars()
+}, 1000 * 60 * 60 * 4)
 var delaybetweenorder = 0.85 //sec
 var takeProfit = parseFloat(process.env.takeProfit) //%
 var stopLoss = parseFloat(process.env.stopLoss) //%

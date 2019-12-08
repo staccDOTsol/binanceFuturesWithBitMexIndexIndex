@@ -1,5 +1,5 @@
-var lowRSI = 15
-var highRSI = 85
+var lowRSI = 9
+var highRSI = 87
 var minCross = 0.035
 var useMFI = false
 var rsiTF = 1
