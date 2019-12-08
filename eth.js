@@ -567,7 +567,7 @@ price=j
 index=j2
 }
 catch (err){
-    consoel.log(err)
+    console.log(err)
 }
 })
 }, 4000)

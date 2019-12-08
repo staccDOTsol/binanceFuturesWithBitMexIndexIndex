@@ -1,4 +1,4 @@
-
+var ejs = require('ejs')
 const binance = require('node-binance-api')().options({
   APIKEY:process.env.key,
   APISECRET: process.env.secret,
