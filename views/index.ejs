@@ -106,8 +106,8 @@
                 }
                 }
                 avg = t / drawdowns.length
-                $('#avgdd').html('Average Daily Drawdown: ' + avg.toPrecision(4) + '%')
-                $('#maxdd').html('Max. Daily Drawdown: ' + high.toPrecision(4) + '%')
+                $('#avgdd').html('Average Daily Drawdown: ' + (avg * 100).toPrecision(4) + '%')
+                $('#maxdd').html('Max. Daily Drawdown: ' + (high * 100).toPrecision(4) + '%')
                 $('#pos').html('                                          ' +jsondata.pos + ' position')
                 $('#vol').html('                                          ' +jsondata.qty + ' BTC notional traded in recent memory')
                 asks= jsondata.btc; 
