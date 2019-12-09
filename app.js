@@ -7,6 +7,13 @@ var mfiTF = 1
 var period = 54
 var kvalue = 5
 var dvalue = 3
+var debug = process.env.debug
+if (debug == 'true'){
+    debug = true
+}
+else {
+    debug = false
+}
         const axios = require('axios')
 
 var request = require('request')
@@ -272,16 +279,21 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
         console.log(new Date())
         console.log('position: ' + position)
         console.log('usedPerc: ' + freePerc)
-        //console.log('rsiover: ' + rsiover)
-        //console.log('rsibelow: ' + rsibelow)
-        //console.log('selldiff')
-        //console.log(diff < -1 * minCross / 1.5)
-        //console.log('buydiff')
-        //console.log(diff > minCross && diff < 100000)
-        //console.log('selling: ' + selling)
-        //console.log('buying: ' + buying)
-        //console.log('bal btc: ' + bal_btc)
-        //console.log('pnl btc: % ' + -1 * (1 - bal_btc / initial_bal) * 100)
+        if (debug){
+        console.log('q1: ' + rsiover)
+        console.log('q2: ' + rsibelow)
+        console.log('q3')
+        console.log(diff < -1 * minCross / 1.5)
+        console.log('q4')
+        console.log(diff > minCross && diff < 100000)
+        console.log('q5: ' + selling)
+        console.log('q6: ' + buying)
+        console.log('v1: ' + theRSI[theRSI.length - 1].k)
+        console.log('v2: ' + diff)
+        console.log('v3: ' + minCross)
+        console.log('bal btc: ' + bal_btc)
+        console.log('pnl btc: % ' + -1 * (1 - bal_btc / initial_bal) * 100)
+        }
         console.log('bal usd: ' + bal_usd)
         console.log('pnl usd: % ' + -1 * (1 - bal_usd / usd_init) * 100)
         pnlusd = -1 * (1 - bal_usd / usd_init) * 100
@@ -297,9 +309,7 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
                 }
             });
         }
- //       console.log('RSI: ' + theRSI[theRSI.length - 1].k)
-  //      console.log('MFI: ' + theMFI[theMFI.length - 1])
-  //      console.log('diff: ' + diff)
+        
         cancelall()
     }
     count++;
