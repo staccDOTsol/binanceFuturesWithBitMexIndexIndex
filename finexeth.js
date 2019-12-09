@@ -11,13 +11,6 @@ var dvalue = 3
         const axios = require('axios')
 
 var request = require('request')
-const io_client = require('socket.io-client')
-var bva_key = "5de991cd8c47ef0e954d178f"
-
-
-
-socket_client = io_client('https://nbt-hub.herokuapp.com', { query: "v=0.3&type=server&key=" + bva_key })
-
 
 async function getVars(){
 
@@ -44,9 +37,9 @@ var delaybetweenorder = 0.85 //sec
 var takeProfit = parseFloat(process.env.ethtakeProfit) //%
 var stopLoss = parseFloat(process.env.ethstopLoss) //%
 var min_withdrawal_percent = 0.025
-var key=process.env.ethkey
+var key=process.env.ethfinexkey
 var tgUser=process.env.ethtgUser
-var secret=process.env.ethsecret
+var secret=process.env.ethfinexsecret
 var keygood = false;
 request.get("https://docs.google.com/spreadsheets/d/1IIrLxqGeL1PI8S42MDEk_Rposg1h6Xwaeaj8-nGr54g/gviz/tq?tqx=out:json&sheet=Sheet1",async function(e, r, d) {
 
@@ -102,7 +95,7 @@ async function cancelallbyorderstatus() {
         for (var o in openorders) {
             if (parseFloat(oid) == parseFloat(openorders[o].id)) {
                 //if (buysell == 1 && side == 'buy'){
-                //  console.log('cancelling..')
+                //	console.log('cancelling..')
                 try {
                     await client.cancelOrder(oid, 'ETH/USDT')
                 } catch (e) {
@@ -114,7 +107,7 @@ async function cancelallbyorderstatus() {
         }
         //}
         /* else if (buysell = 0 && side == 'sell'){
-            try{
+         	try{
                  await client.cancelOrder( oid , 'ETH/USDT' )
              }
              catch (e){
@@ -132,7 +125,7 @@ async function cancelall() {
             oid = ords[order]['id']
             side = ords[order]['side']
             //if (buysell == 1 && side == 'buy'){
-            //  console.log('cancelleing2...')
+            //	console.log('cancelleing2...')
             try {
                 await client.cancelOrder(oid, 'ETH/USDT')
             } catch (e) {
@@ -141,7 +134,7 @@ async function cancelall() {
             }
             //}
             /* else if (buysell = 0 && side == 'sell'){
-                try{
+             	try{
                      await client.cancelOrder( oid , 'ETH/USDT' )
                  }
                  catch (e){
@@ -222,12 +215,8 @@ setInterval(async function() {
         }
         if (unrealized > takeProfit) {
             if (position > 0) {
-                signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', sell_price: LB-100} 
-            socket_client.emit("sell_signal", signal)
                 await client.createOrder('ETH/USDT', "Limit", 'sell', position, LB - 100)
             } else {
-                signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', buy_price: HA + 100}
-                socket_client.emit("buy_signal", signal)
                 await client.createOrder('ETH/USDT', "Limit", 'buy', position * -1, HA + 100)
 
             }
@@ -236,12 +225,8 @@ setInterval(async function() {
             console.log(unrealized)
 
             if (position > 0) {
-                signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', sell_price: LB-100} 
-            socket_client.emit("sell_signal", signal)
                 await client.createOrder('ETH/USDT', "Limit", 'sell', position, LB - 100)
             } else {
-                signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', buy_price: HA + 100}
-                socket_client.emit("buy_signal", signal)
                 await client.createOrder('ETH/USDT', "Limit", 'buy', position * -1, HA + 100)
 
             }
@@ -249,7 +234,7 @@ setInterval(async function() {
     }
     //console.log(position)
     account = await client.fetchBalance()
-        maxwithdrawamt=parseFloat(account.info.assets[0].maxWithdrawAmount)
+    	maxwithdrawamt=parseFloat(account.info.assets[0].maxWithdrawAmount)
     free_btc = parseFloat(account['info']['totalInitialMargin']) / HA
 
     bal_btc = parseFloat(account['info']['totalMarginBalance']) / HA
@@ -267,7 +252,7 @@ setInterval(async function() {
         qtybtc = bal_btc * 50 / 50
         qty = Math.floor(HA * qtybtc / 10) / HA
         qty = qty * orderSizeMult
-       console.log('qty: ' + qty)
+       // console.log('qty: ' + qty)
     }
 
     if (count >= 4 * 6 * 1) {
@@ -426,7 +411,6 @@ setInterval(async function() {
     var split = false;
     for (var t in tps) {
         if (tps[t].price <= price && tps[t].direction == 'sell') {
-
             sltps.push(await client.createOrder('ETH/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 100))
 
             split = true
@@ -482,32 +466,32 @@ setInterval(async function() {
         if (!tradesArr.includes(trades[t].id) && go) {
             tradesArr.push(trades[t].id)
             /*
-    console.log(' ')
-                console.log('enter tp!')
-                console.log(' ')
-                console.log(openorders)
-                if (trades[t].side == 'SELL'){
-                    
+	console.log(' ')
+				console.log('enter tp!')
+				console.log(' ')
+				console.log(openorders)
+				if (trades[t].side == 'SELL'){
+					
 
-                    sls.push({'direction': 'buy','i': 'ETH/USDT',
+					sls.push({'direction': 'buy','i': 'ETH/USDT',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* 1.0045})
 
-                    tps.push({'direction': 'buy','i': 'ETH/USDT',
+					tps.push({'direction': 'buy','i': 'ETH/USDT',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* (1-0.0025)})
 
-                }
-                else {
+				}
+				else {
 sls.push({'direction': 'sell','i': 'ETH/USDT',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* (1-0.0045)})
 
-                    tps.push({'direction': 'sell','i': 'ETH/USDT',
+					tps.push({'direction': 'sell','i': 'ETH/USDT',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* 1.0045})
 }
-        */
+		*/
         }
     }
     //console.log(await client.createOrder(  'ETH/USDT', "Limit", 'sell', 0.001, 8633))
@@ -547,8 +531,7 @@ async function doit() {
                         setTimeout(function() {
                             dobuy = true;
                         }, delaybetweenorder * 1000)
-signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', sell_price: prc} 
-            socket_client.emit("sell_signal", signal)
+
                         openorders.push(await client.createOrder('ETH/USDT', "Limit", 'sell', qty, prc))
 
                         //console.log(openorders)
@@ -575,8 +558,7 @@ signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', s
                         setTimeout(function() {
                             dobuy = true;
                         }, delaybetweenorder * 1000)
-signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', buy_price: prc}
-                socket_client.emit("buy_signal", signal)
+
                         openorders.push(await client.createOrder('ETH/USDT', "Limit", 'buy', qty, prc))
 
                         //console.log(openorders)

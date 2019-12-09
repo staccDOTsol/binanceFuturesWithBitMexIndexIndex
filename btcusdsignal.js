@@ -1,55 +1,61 @@
-var lowRSI = 9
-var highRSI = 87
-var minCross = 0.035
+var lowRSI = 3.5
+var highRSI = 99
+var minCross = 0.0025
 var useMFI = false
 var rsiTF = 1
 var mfiTF = 1
 var period = 54
 var kvalue = 5
 var dvalue = 3
-const axios = require('axios')
+        const axios = require('axios')
+
+var request = require('request')
 const io_client = require('socket.io-client')
 var bva_key = "5de991cd8c47ef0e954d178f"
 
 
 
-socket_client = io_client('https://nbt-hub.herokuapp.com', {
-    query: "v=0.3&type=server&key=" + bva_key
+socket_client = io_client('https://nbt-hub.herokuapp.com', { query: "v=0.3&type=server&key=" + bva_key })
+async function getVars(){
+
+request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
+    try {
+        j = JSON.parse(d)
+        lowRSI = parseFloat(j.lowRSI)
+        highRSI = parseFloat(j.highRSI)
+        minCross = parseFloat(j.minCross)
+        rsiTF = parseFloat(j.RSItf)
+        period = parseFloat(j.RSIPeriod) 
+    }
+    catch (err){
+        console.log(err)
+    }
 })
 
-var request = require('request')
+}
+getVars()
+setInterval(async function(){
+getVars()
+}, 1000 * 60 * 60 * 4)
 var delaybetweenorder = 0.85 //sec
 var takeProfit = parseFloat(process.env.takeProfit) //%
 var stopLoss = parseFloat(process.env.stopLoss) //%
 var min_withdrawal_percent = 0.025
-var key = process.env.key
-var tgUser = process.env.tgUser
-var secret = process.env.secret
+var key=process.env.key
+var tgUser=process.env.tgUser
+var secret=process.env.secret
 var keygood = false;
-request.get("https://docs.google.com/spreadsheets/d/1IIrLxqGeL1PI8S42MDEk_Rposg1h6Xwaeaj8-nGr54g/gviz/tq?tqx=out:json&sheet=Sheet1", async function(e, r, d) {
-    if (d.includes(key.substring(key.length - 6, key.length))) {
-        keygood = true;
-        console.log('keygood')
-    }
-})
+request.get("https://docs.google.com/spreadsheets/d/1IIrLxqGeL1PI8S42MDEk_Rposg1h6Xwaeaj8-nGr54g/gviz/tq?tqx=out:json&sheet=Sheet1",async function(e, r, d) {
+        if (d.includes(key.substring(key.length-6, key.length))) {
+keygood = true;
+console.log('keygood')
+            }
+        })
 var maxFreePerc = parseFloat(process.env.maxFreePerc)
 var orderSizeMult = parseFloat(process.env.orderSizeMult)
 const ccxt = require('ccxt')
 var bitmex = new ccxt.bitmex()
 var client = new ccxt.binance({
-    "apiKey": key,
-    "secret": secret,
-
-    'enableRateLimit': true,
-
-})
-var client2 = new ccxt.binance({
-
-    'enableRateLimit': true,
-
-})
-
-var client3 = new ccxt.binance({
     "apiKey": key,
     "secret": secret,
     "options": {
@@ -63,11 +69,20 @@ var client3 = new ccxt.binance({
         },
     }
 })
-
-//client.urls['api'] = client.urls['test']
+var client2 = new ccxt.binance({
+    "options": {
+        "defaultMarket": "futures"
+    },
+    'enableRateLimit': true,
+    'urls': {
+        'api': {
+            'public': 'https://fapi.binance.com/fapi/v1',
+            'private': 'https://fapi.binance.com/fapi/v1',
+        },
+    }
+}) //client.urls['api'] = client.urls['test']
 var account;
 var LB;
-var signal;
 var HA;
 var bal_usd;
 var usd_init;
@@ -137,10 +152,6 @@ first = true;
 var freePerc;
 var position = 0;
 setInterval(async function() {
-
-    if (freePerc == undefined) {
-        freePerc = 0
-    }
     if (first) {
         var trades = await client.fapiPrivateGetUserTrades({
             'symbol': 'BTCUSDT',
@@ -206,23 +217,12 @@ setInterval(async function() {
         }
         if (unrealized > takeProfit) {
             if (position > 0) {
+                signal = { key: bva_key, stratname: 'BTC 2.0 bit.ly/NeoNBot', pair: 'BTCUSDT', sell_price: LB-100} 
+            socket_client.emit("sell_signal", signal)
                 await client.createOrder('BTC/USDT', "Limit", 'sell', position, LB - 100)
-                signal = {
-                    key: bva_key,
-                    stratname: 'BTC bit.ly/NeoNBot',
-                    pair: 'BTCUSDT',
-                    sell_price: LB - 100
-                }
-                socket_client.emit("sell_signal", signal)
             } else {
-                signal = {
-                    key: bva_key,
-                    stratname: 'BTC bit.ly/NeoNBot',
-                    pair: 'BTCUSDT',
-                    buy_price: HA + 100
-                }
+                signal = { key: bva_key, stratname: 'BTC 2.0 bit.ly/NeoNBot', pair: 'BTCUSDT', buy_price: HA + 100}
                 socket_client.emit("buy_signal", signal)
-
                 await client.createOrder('BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
 
             }
@@ -231,21 +231,11 @@ setInterval(async function() {
             console.log(unrealized)
 
             if (position > 0) {
+                signal = { key: bva_key, stratname: 'BTC 2.0 bit.ly/NeoNBot', pair: 'BTCUSDT', sell_price: LB-100} 
+            socket_client.emit("sell_signal", signal)
                 await client.createOrder('BTC/USDT', "Limit", 'sell', position, LB - 100)
-                signal = {
-                    key: bva_key,
-                    stratname: 'BTC bit.ly/NeoNBot',
-                    pair: 'BTCUSDT',
-                    sell_price: LB - 100
-                }
-                socket_client.emit("sell_signal", signal)
             } else {
-                signal = {
-                    key: bva_key,
-                    stratname: 'BTC bit.ly/NeoNBot',
-                    pair: 'BTCUSDT',
-                    buy_price: HA + 100
-                }
+                signal = { key: bva_key, stratname: 'BTC 2.0 bit.ly/NeoNBot', pair: 'BTCUSDT', buy_price: HA + 100}
                 socket_client.emit("buy_signal", signal)
                 await client.createOrder('BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
 
@@ -253,18 +243,16 @@ setInterval(async function() {
         }
     }
     //console.log(position)
-    account = await client3.fetchBalance()
-    maxwithdrawamt = parseFloat(account.info.assets[0].maxWithdrawAmount)
+    account = await client.fetchBalance()
+        maxwithdrawamt=parseFloat(account.info.assets[0].maxWithdrawAmount)
     free_btc = parseFloat(account['info']['totalInitialMargin']) / HA
 
     bal_btc = parseFloat(account['info']['totalMarginBalance']) / HA
     bal_usd = parseFloat(account['info']['totalMarginBalance'])
 
 
-    if (bal_usd > 1) {
-        freePerc = (maxwithdrawamt / bal_usd)
-    }
-    // console.log(freePerc)
+    freePerc = (maxwithdrawamt / bal_usd)
+   // console.log(freePerc)
     if (first) {
 
         //await client.loadProducts () 
@@ -274,25 +262,23 @@ setInterval(async function() {
         qtybtc = bal_btc * 50 / 50
         qty = Math.floor(HA * qtybtc / 10) / HA
         qty = qty * orderSizeMult
-        console.log('qty: ' + qty)
+     console.log('qty: ' + qty)
     }
 
-    if (count >= 1 * 6 * 1) {
+    if (count >= 4 * 6 * 1) {
         count = 0;
 
-        axios.post('https://patrickbot.dunncreativess.now.sh/user', {
-                user: tgUser,
-                bal: bal_usd,
-                now: new Date().getTime(),
-                bal_init: usd_init
-            })
-            .then((res) => {
-                console.log(`statusCode: ${res.statusCode}`)
-                //console.log(res)
-            })
-            .catch((error) => {
-                console.error(error)
-            })
+axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
+  bal: bal_usd,
+  now: new Date().getTime(),
+  bal_init: usd_init })
+.then((res) => {
+  console.log(`statusCode: ${res.statusCode}`)
+  //console.log(res)
+})
+.catch((error) => {
+  console.error(error)
+})
 
         console.log(' ')
         console.log('-----')
@@ -324,9 +310,9 @@ setInterval(async function() {
                 }
             });
         }
-        //       console.log('RSI: ' + theRSI[theRSI.length - 1].k)
-        //      console.log('MFI: ' + theMFI[theMFI.length - 1])
-        //      console.log('diff: ' + diff)
+ //       console.log('RSI: ' + theRSI[theRSI.length - 1].k)
+  //      console.log('MFI: ' + theMFI[theMFI.length - 1])
+  //      console.log('diff: ' + diff)
         cancelall()
     }
     count++;
@@ -525,118 +511,102 @@ var dobuy = true;
 var ohlcvs = []
 var request = require('request');
 async function doit() {
-    if (keygood) {
+    if (keygood){
 
 
-        if (price > index) {
-            above = 1;
-        } else {
-            above = 0;
-        }
-        diff = price / index;
-        diff = -1 * (1 - diff) * 100
-      console.log(diff < -1 * minCross / 1.5)
-        console.log(theRSI[theRSI.length - 1].k)
-        console.log(rsiover)
-        console.log(rsibelow)   /*
-        console.log(selling)
-        console.log(buying)
-        console.log(freePerc > maxFreePerc) */
-        if (diff < -1 * minCross / 1.5 && rsiover) { //} && (useMFI && mfiover)){
-            console.log('it wants to sell 1')
-            if (selling == 0 && (freePerc < maxFreePerc || position > 0)) {
-                console.log('it wants to sell 2')
-                //selling = 1;
-                buysell = 0;
-                //buying = 0;
-                prc = HA
-                qtybtc = bal_btc * 50 / 50
-                qty = Math.floor(prc * qtybtc / 10) / HA
-                qty = qty * orderSizeMult
-                if (position > 0) {
-                    qty = qty * 2
-                }
-                if (dobuy) {
-                    console.log('it wants to sell 3')
-                    dobuy = false;
-                    setTimeout(function() {
-                        dobuy = true;
-                    }, delaybetweenorder * 1000)
-
-                    openorders.push(await client.createOrder('BTC/USDT', "Limit", 'sell', qty, prc))
-                    signal = {
-                        key: bva_key,
-                        stratname: 'BTC bit.ly/NeoNBot',
-                        pair: 'BTCUSDT',
-                        sell_price: prc
-                    }
-                    socket_client.emit("sell_signal", signal)
-                    //console.log(openorders)
-                    console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' sell!') //ask
-                }
+            if (price > index) {
+                above = 1;
+            } else {
+                above = 0;
             }
-        } else if (diff > minCross && diff < 100000 && rsibelow) { //} && (useMFI && mfibelow)){
-            console.log('it wants to buy 1')
-            if (buying == 0 && (freePerc < maxFreePerc || position < 0)) {
-                console.log('it wants to buy 2')
-                //selling = 0;
-                //buying = 1;
-                buysell = 1;
-                prc = LB
-                qtybtc = bal_btc * 50 / 50
-                qty = Math.floor(prc * qtybtc / 10) / LB
-                qty = qty * orderSizeMult
-                if (position < 0) {
-                    qty = qty * 2
-                }
-                if (dobuy) {
-                    console.log('it wants to buy 3')
-                    dobuy = false;
-                    setTimeout(function() {
-                        dobuy = true;
-                    }, delaybetweenorder * 1000)
-                    signal = {
-                        key: bva_key,
-                        stratname: 'BTC bit.ly/NeoNBot',
-                        pair: 'BTCUSDT',
-                        buy_price: prc
+            diff = price / index;
+            diff = -1 * (1 - diff) * 100
+            if (diff < -1 * minCross / 1.5 && rsiover) { //} && (useMFI && mfiover)){
+                console.log('it wants to sell 1')
+                if (selling == 0){// && (freePerc < maxFreePerc || position > 0)) {
+                    console.log('it wants to sell 2')
+                    //selling = 1;
+                    buysell = 0;
+                    //buying = 0;
+                    prc = HA
+                    qtybtc = bal_btc * 50 / 50
+                    qty = Math.floor(prc * qtybtc / 10) / HA
+                    qty = qty * orderSizeMult
+                    if (position > 0) {
+                        qty = qty * 2
                     }
-                    socket_client.emit("buy_signal", signal)
-                    openorders.push(await client.createOrder('BTC/USDT', "Limit", 'buy', qty, prc))
+                    if (dobuy) {
+                        console.log('it wants to sell 3')
+                        dobuy = false;
+                        setTimeout(function() {
+                            dobuy = true;
+                        }, delaybetweenorder * 1000)
+signal = { key: bva_key, stratname: 'BTC 2.0 bit.ly/NeoNBot', pair: 'BTCUSDT', sell_price: prc} 
+            socket_client.emit("sell_signal", signal)
+                        openorders.push(await client.createOrder('BTC/USDT', "Limit", 'sell', qty, prc))
 
-                    //console.log(openorders)
-
-                    console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' buy!') //bid
-
+                        //console.log(openorders)
+                        console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' sell!') //ask
+                    }
                 }
+            } else if (diff > minCross && diff < 100000 && rsibelow) { //} && (useMFI && mfibelow)){
+                console.log('it wants to buy 1')
+                if (buying == 0){// && (freePerc < maxFreePerc || position < 0)) {
+                    console.log('it wants to buy 2')
+                    //selling = 0;
+                    //buying = 1;
+                    buysell = 1;
+                    prc = LB
+                    qtybtc = bal_btc * 50 / 50
+                    qty = Math.floor(prc * qtybtc / 10) / LB
+                    qty = qty * orderSizeMult
+                    if (position < 0) {
+                        qty = qty * 2
+                    }
+                    if (dobuy) {
+                        console.log('it wants to buy 3')
+                        dobuy = false;
+                        setTimeout(function() {
+                            dobuy = true;
+                        }, delaybetweenorder * 1000)
+signal = { key: bva_key, stratname: 'BTC 2.0 bit.ly/NeoNBot', pair: 'BTCUSDT', buy_price: prc}
+                socket_client.emit("buy_signal", signal)
+                        openorders.push(await client.createOrder('BTC/USDT', "Limit", 'buy', qty, prc))
+
+                        //console.log(openorders)
+
+                        console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' buy!') //bid
+
+                    }
+                }
+
             }
-
         }
-    }
 
-
+    
 }
-setInterval(function() {
+setInterval(function(){
     doit()
-}, delaybetweenorder * 1000)
-setInterval(async function() {
-    //ticker1 = await bitmex.fetchTicker('BTC/USD')
+},delaybetweenorder *1000)
+setInterval(async function(){
+//ticker1 = await bitmex.fetchTicker('BTC/USD')
 
-    //price = ticker1.lastPrice
-    //index=(ticker1.markPrice)
+//price = ticker1.lastPrice
+//index=(ticker1.markPrice)
 
 
-    request.get('https://www.bitmex.com/api/v1/instrument?symbol=XBTUSD', function(e, r, d) {
-        try {
-            j = JSON.parse(d)[0].lastPrice
+request.get('https://www.bitmex.com/api/v1/instrument?symbol=XBTUSD', function (e, r, d){
+try {
+j = JSON.parse(d)[0].lastPrice
 
-            j2 = JSON.parse(d)[0].markPrice
-            price = j
-            index = j2
-        } catch (err) {
+j2 = JSON.parse(d)[0].markPrice
+price=j
+index=j2
+}
+catch (err){
     console.log(err)
-        }
-    })
+}
+})
 }, 4000)
 /*setInterval(function(){
     console.log(index)

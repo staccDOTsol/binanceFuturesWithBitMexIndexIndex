@@ -1,6 +1,6 @@
-var secret=""
-var key=""
-var dollars = 50
+var secret=process.env.secret
+var key=process.env.key
+var dollars = 5
 const ccxt = require('ccxt')
 var client = new ccxt.binance({
     "apiKey": key,
@@ -26,6 +26,7 @@ setTimeout(async function(){
             'limit': 1000
         })
         for (var t in trades) {
+            console.log(trades[t])
             tradesArr.push(trades[t].id)
         }
 setInterval(async function(){
@@ -33,7 +34,6 @@ trades = await client.fapiPrivateGetUserTrades({
             'symbol': 'BTCUSDT',
             'limit': 1000
         })
-console.log(orders)
         for (var t in trades) {
             if (!tradesArr.includes(trades[t].id)){
             var go = true
@@ -49,11 +49,13 @@ qty = parseFloat(trades[t].qty)
 price = parseFloat(trades[t].price)
 if (trades[t].side == 'SELL'){
 var o = await client.createOrder('BTC/USDT', "Limit", 'buy', qty, price - dollars)
-orders.push(o.id)
+orders.push(parseFloat(o.id))
+console.log(orders)
 }
 else {
     var o = await client.createOrder('BTC/USDT', "Limit", 'sell', qty, price + dollars)
-    orders.push(o.id)
+    orders.push(parseFloat(o.id))
+    console.log(orders)
 }
 }
         }

@@ -7,6 +7,11 @@ export ethtakeProfit=4.5
 export ethstopLoss=-6.5
 export ethtgUser=JareDunn
 export tgUser=JareDunn
+export finexLeverage=25
+export finexkey=
+export finexsecret=
+export ethfinexkey=
+export ethfinexsecret=
 export key=
 export secret=
 export ethkey=
@@ -34,7 +39,11 @@ setx ethkey ""
 setx ethsecret ""
 setx site "http://coindexbot.duckdns.org"
 setx port "8080"
-
+setx finexLeverage "25"
+setx finexkey ""
+setx finexsecret ""
+setx ethfinexkey ""
+setx ethfinexsecret ""
 setx maxFreePerc "0.9"
 setx ethmaxFreePerc "0.9"
 setx orderSizeMult "1"

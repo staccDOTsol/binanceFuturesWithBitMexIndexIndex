@@ -7,17 +7,9 @@ var mfiTF = 1
 var period = 54
 var kvalue = 5
 var dvalue = 3
-
         const axios = require('axios')
 
 var request = require('request')
-const io_client = require('socket.io-client')
-var bva_key = "5de991cd8c47ef0e954d178f"
-
-
-
-socket_client = io_client('https://nbt-hub.herokuapp.com', { query: "v=0.3&type=server&key=" + bva_key })
-
 
 async function getVars(){
 
@@ -41,50 +33,37 @@ setInterval(async function(){
 getVars()
 }, 1000 * 60 * 60 * 4)
 var delaybetweenorder = 0.85 //sec
-var takeProfit = parseFloat(process.env.ethtakeProfit) //%
-var stopLoss = parseFloat(process.env.ethstopLoss) //%
+var takeProfit = parseFloat(process.env.takeProfit) //%
+var stopLoss = parseFloat(process.env.stopLoss) //%
 var min_withdrawal_percent = 0.025
-var key=process.env.ethkey
-var tgUser=process.env.ethtgUser
-var secret=process.env.ethsecret
+var key=process.env.finexkey
+var tgUser=process.env.tgUser
+var secret=process.env.finexsecret
 var keygood = false;
 request.get("https://docs.google.com/spreadsheets/d/1IIrLxqGeL1PI8S42MDEk_Rposg1h6Xwaeaj8-nGr54g/gviz/tq?tqx=out:json&sheet=Sheet1",async function(e, r, d) {
-
-if (d.includes(key.substring(key.length-6, key.length))) {
+        if (d.includes(key.substring(key.length-6, key.length))) {
 keygood = true;
 console.log('keygood')
             }
         })
-var maxFreePerc = parseFloat(process.env.ethmaxFreePerc)
-var orderSizeMult = parseFloat(process.env.ethorderSizeMult)
+var leverage = parseFloat(process.env.finexLeverage)
+var maxFreePerc = parseFloat(process.env.maxFreePerc)
+var orderSizeMult = parseFloat(process.env.orderSizeMult)
 const ccxt = require('ccxt')
 var bitmex = new ccxt.bitmex()
-var client = new ccxt.binance({
+var client = new ccxt.bitfinex({
     "apiKey": key,
     "secret": secret,
-    "options": {
-        "defaultMarket": "futures"
-    },
-    'enableRateLimit': true,
-    'urls': {
-        'api': {
-            'public': 'https://fapi.binance.com/fapi/v1',
-            'private': 'https://fapi.binance.com/fapi/v1',
-        },
-    }
 })
-
-var client2 = new ccxt.binance({
-    "options": {
-        "defaultMarket": "futures"
-    },
-    'enableRateLimit': true,
-    'urls': {
-        'api': {
-            'public': 'https://fapi.binance.com/fapi/v1',
-            'private': 'https://fapi.binance.com/fapi/v1',
-        },
+async function lala(){
+    aa=(await client.fetchMarkets())
+    for (var a in aa){
+        //console.log(aa[a].symbol)
     }
+}
+lala()
+var client2 = new ccxt.bitfinex({
+
 }) //client.urls['api'] = client.urls['test']
 var account;
 var LB;
@@ -94,7 +73,7 @@ var usd_init;
 var bal_btc;
 cancelall()
 async function cancelallbyorderstatus() {
-    ords = await client.fetchOpenOrders('ETH/USDT')
+    ords = await client.fetchOpenOrders('BTCF0/USTF0')
 
     for (var order in ords) {
         oid = ords[order]['info']['orderId']
@@ -102,9 +81,9 @@ async function cancelallbyorderstatus() {
         for (var o in openorders) {
             if (parseFloat(oid) == parseFloat(openorders[o].id)) {
                 //if (buysell == 1 && side == 'buy'){
-                //  console.log('cancelling..')
+                //	console.log('cancelling..')
                 try {
-                    await client.cancelOrder(oid, 'ETH/USDT')
+                    await client.cancelOrder(oid, 'BTCF0/USTF0')
                 } catch (e) {
                     console.log(e)
 
@@ -114,8 +93,8 @@ async function cancelallbyorderstatus() {
         }
         //}
         /* else if (buysell = 0 && side == 'sell'){
-            try{
-                 await client.cancelOrder( oid , 'ETH/USDT' )
+         	try{
+                 await client.cancelOrder( oid , 'BTCF0/USTF0' )
              }
              catch (e){
                  console.log(e)
@@ -125,24 +104,24 @@ async function cancelallbyorderstatus() {
     }
 }
 async function cancelall() {
-    ords = await client.fetchOpenOrders('ETH/USDT')
+    ords = await client.fetchOpenOrders('BTCF0/USTF0')
 
     for (var order in ords) {
         if (true) {
             oid = ords[order]['id']
             side = ords[order]['side']
             //if (buysell == 1 && side == 'buy'){
-            //  console.log('cancelleing2...')
+            //	console.log('cancelleing2...')
             try {
-                await client.cancelOrder(oid, 'ETH/USDT')
+                await client.cancelOrder(oid, 'BTCF0/USTF0')
             } catch (e) {
                 console.log(e)
 
             }
             //}
             /* else if (buysell = 0 && side == 'sell'){
-                try{
-                     await client.cancelOrder( oid , 'ETH/USDT' )
+             	try{
+                     await client.cancelOrder( oid , 'BTCF0/USTF0' )
                  }
                  catch (e){
                      console.log(e)
@@ -158,14 +137,13 @@ var freePerc;
 var position = 0;
 setInterval(async function() {
     if (first) {
-        var trades = await client.fapiPrivateGetUserTrades({
-            'symbol': 'BTCUSDT',
-            'limit': 1000
+        var trades = await client.privatePostMytrades({
+            'symbol': 'BTCF0/USTF0'
         })
         for (var t in trades) {
-            tradesArr.push(trades[t].id)
+            tradesArr.push(trades[t].tid)
         }
-        ohlcv = await client2.fetchOHLCV('ETH/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 74, params = {})
+        ohlcv = await client2.fetchOHLCV('BTCF0/USTF0', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 74, params = {})
         //console.log(ohlcv)
         var c = 0;
         for (var b in ohlcv) {
@@ -178,7 +156,7 @@ setInterval(async function() {
                 rsis[0].shift()
             }
         }
-        ohlcv = await client2.fetchOHLCV('ETH/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
+        ohlcv = await client2.fetchOHLCV('BTCF0/USTF0', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
         //console.log(ohlcv)
         high = []
         low = []
@@ -209,26 +187,22 @@ setInterval(async function() {
         });
         //console.log(theMFI[theMFI.length-1])
     }
-    pos = await client.fapiPrivateGetPositionRisk()
-    ticker = await client.fetchTicker('ETH/USDT')
+    pos = await client.privatePostPositions()
+    ticker = await client.fetchTicker('BTCF0/USTF0')
     LB = ticker.last + 0.5
-    //console.log(await client.fetchTicker( 'ETH/USDT' ))
+    //console.log(await client.fetchTicker( 'BTCF0/USTF0' ))
     HA = ticker.last - 0.5
     if (pos[0] != undefined) {
-        position = parseFloat(pos[0]['positionAmt'])
-        unrealized = parseFloat(pos[0]['unRealizedProfit']) / (position * HA) * parseFloat(pos[0]['leverage']) * 100
+        position = parseFloat(pos[0]['amount'])
+        unrealized = parseFloat(pos[0]['pl']) / (position * HA) * parseFloat(leverage) * 100
         if (position < 0) {
             unrealized = unrealized * -1
         }
         if (unrealized > takeProfit) {
             if (position > 0) {
-                signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', sell_price: LB-100} 
-            socket_client.emit("sell_signal", signal)
-                await client.createOrder('ETH/USDT', "Limit", 'sell', position, LB - 100)
+                await client.createOrder('BTCF0/USTF0', "Limit", 'sell', position, LB - 100, {'lev': leverage})
             } else {
-                signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', buy_price: HA + 100}
-                socket_client.emit("buy_signal", signal)
-                await client.createOrder('ETH/USDT', "Limit", 'buy', position * -1, HA + 100)
+                await client.createOrder('BTCF0/USTF0', "Limit", 'buy', position * -1, HA + 100, {'lev': leverage})
 
             }
         }
@@ -236,24 +210,25 @@ setInterval(async function() {
             console.log(unrealized)
 
             if (position > 0) {
-                signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', sell_price: LB-100} 
-            socket_client.emit("sell_signal", signal)
-                await client.createOrder('ETH/USDT', "Limit", 'sell', position, LB - 100)
+                await client.createOrder('BTCF0/USTF0', "Limit", 'sell', position, LB - 100, {'lev': leverage})
             } else {
-                signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', buy_price: HA + 100}
-                socket_client.emit("buy_signal", signal)
-                await client.createOrder('ETH/USDT', "Limit", 'buy', position * -1, HA + 100)
+                await client.createOrder('BTCF0/USTF0', "Limit", 'buy', position * -1, HA + 100, {'lev': leverage})
 
             }
         }
     }
     //console.log(position)
-    account = await client.fetchBalance()
-        maxwithdrawamt=parseFloat(account.info.assets[0].maxWithdrawAmount)
-    free_btc = parseFloat(account['info']['totalInitialMargin']) / HA
+    account = await client.privatePostBalances()
+    for(var acc in account){
+        if (account[acc].currency == 'ustf0'){
+                    maxwithdrawamt=parseFloat(account[acc].available)
+free_btc = parseFloat(account[acc].available) / HA
 
-    bal_btc = parseFloat(account['info']['totalMarginBalance']) / HA
-    bal_usd = parseFloat(account['info']['totalMarginBalance'])
+    bal_btc = parseFloat(account[acc].amount) / HA
+    bal_usd = parseFloat(account[acc].amount)
+        }
+    }
+    
 
 
     freePerc = (maxwithdrawamt / bal_usd)
@@ -267,7 +242,7 @@ setInterval(async function() {
         qtybtc = bal_btc * 50 / 50
         qty = Math.floor(HA * qtybtc / 10) / HA
         qty = qty * orderSizeMult
-       console.log('qty: ' + qty)
+     console.log('qty: ' + qty)
     }
 
     if (count >= 4 * 6 * 1) {
@@ -290,16 +265,16 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
         console.log(new Date())
         console.log('position: ' + position)
         console.log('usedPerc: ' + freePerc)
-        console.log('rsiover: ' + rsiover)
-        console.log('rsibelow: ' + rsibelow)
-        console.log('selldiff')
-        console.log(diff < -1 * minCross / 1.5)
-        console.log('buydiff')
-        console.log(diff > minCross && diff < 100000)
-        console.log('selling: ' + selling)
-        console.log('buying: ' + buying)
-        console.log('bal btc: ' + bal_btc)
-        console.log('pnl btc: % ' + -1 * (1 - bal_btc / initial_bal) * 100)
+        //console.log('rsiover: ' + rsiover)
+        //console.log('rsibelow: ' + rsibelow)
+        //console.log('selldiff')
+        //console.log(diff < -1 * minCross / 1.5)
+        //console.log('buydiff')
+        //console.log(diff > minCross && diff < 100000)
+        //console.log('selling: ' + selling)
+        //console.log('buying: ' + buying)
+        //console.log('bal btc: ' + bal_btc)
+        //console.log('pnl btc: % ' + -1 * (1 - bal_btc / initial_bal) * 100)
         console.log('bal usd: ' + bal_usd)
         console.log('pnl usd: % ' + -1 * (1 - bal_usd / usd_init) * 100)
         pnlusd = -1 * (1 - bal_usd / usd_init) * 100
@@ -315,9 +290,9 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
                 }
             });
         }
-        console.log('RSI: ' + theRSI[theRSI.length - 1].k)
-        console.log('MFI: ' + theMFI[theMFI.length - 1])
-      console.log('diff: ' + diff)
+ //       console.log('RSI: ' + theRSI[theRSI.length - 1].k)
+  //      console.log('MFI: ' + theMFI[theMFI.length - 1])
+  //      console.log('diff: ' + diff)
         cancelall()
     }
     count++;
@@ -337,7 +312,7 @@ var buysell = -1
 var theRSI = []
 var theMFI = []
 setInterval(async function() {
-    ohlcv = await client2.fetchOHLCV('ETH/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
+    ohlcv = await client2.fetchOHLCV('BTCF0/USTF0', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
     //console.log(ohlcv)
     var c = 0;
     for (var b in ohlcv) {
@@ -358,7 +333,7 @@ setInterval(async function() {
         values: rsis[0]
     });
     //console.log(theRSI[theRSI.length-1].k)
-    ohlcv = await client2.fetchOHLCV('ETH/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 17, params = {})
+    ohlcv = await client2.fetchOHLCV('BTCF0/USTF0', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 17, params = {})
     high = []
     low = []
     close = []
@@ -426,13 +401,12 @@ setInterval(async function() {
     var split = false;
     for (var t in tps) {
         if (tps[t].price <= price && tps[t].direction == 'sell') {
-
-            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 100))
+            sltps.push(await client.createOrder('BTCF0/USTF0', "Limit", 'sell', tps[t].amt, tps[t].price + 100, {'lev': leverage}))
 
             split = true
         }
         if (tps[t].price >= price && tps[t].direction == 'buy') {
-            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'buy', tps[t].amt, tps[t].price - 100))
+            sltps.push(await client.createOrder('BTCF0/USTF0', "Limit", 'buy', tps[t].amt, tps[t].price - 100, {'lev': leverage}))
 
             split = true
         }
@@ -449,12 +423,12 @@ setInterval(async function() {
     split = false;
     for (var t in sls) {
         if (sls[t].price >= price && sls[t].direction == 'sell') {
-            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'sell', sls[t].amt, sls[t].price + 100))
+            sltps.push(await client.createOrder('BTCF0/USTF0', "Limit", 'sell', sls[t].amt, sls[t].price + 100, {'lev': leverage}))
 
             split = true
         }
         if (sls[t].price <= price && sls[t].direction == 'buy') {
-            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'buy', sls[t].amt, sls[t].price - 100))
+            sltps.push(await client.createOrder('BTCF0/USTF0', "Limit", 'buy', sls[t].amt, sls[t].price - 100, {'lev': leverage}))
 
             split = true
         }
@@ -466,51 +440,50 @@ setInterval(async function() {
         sls.splice(t, 1)
 
     }
-    var trades = await client.fapiPrivateGetUserTrades({
-        'symbol': 'BTCUSDT',
-        'limit': 1000
+    var trades = await client.privatePostMytrades({
+        'symbol': 'BTCF0/USTF0'
     })
     //console.log(trades)
     //console.log(tradesArr)
     for (var t in trades) {
         go = true;
         for (var s in sltps) {
-            if (sltps[s].id == trades[t].orderId) {
+            if (sltps[s].id == trades[t].order_id) {
                 go = false;
             }
         }
-        if (!tradesArr.includes(trades[t].id) && go) {
-            tradesArr.push(trades[t].id)
+        if (!tradesArr.includes(trades[t].tid) && go) {
+            tradesArr.push(trades[t].tid)
             /*
-    console.log(' ')
-                console.log('enter tp!')
-                console.log(' ')
-                console.log(openorders)
-                if (trades[t].side == 'SELL'){
-                    
+	console.log(' ')
+				console.log('enter tp!')
+				console.log(' ')
+				console.log(openorders)
+				if (trades[t].side == 'SELL'){
+					
 
-                    sls.push({'direction': 'buy','i': 'ETH/USDT',
+					sls.push({'direction': 'buy','i': 'BTCF0/USTF0',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* 1.0045})
 
-                    tps.push({'direction': 'buy','i': 'ETH/USDT',
+					tps.push({'direction': 'buy','i': 'BTCF0/USTF0',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* (1-0.0025)})
 
-                }
-                else {
-sls.push({'direction': 'sell','i': 'ETH/USDT',
+				}
+				else {
+sls.push({'direction': 'sell','i': 'BTCF0/USTF0',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* (1-0.0045)})
 
-                    tps.push({'direction': 'sell','i': 'ETH/USDT',
+					tps.push({'direction': 'sell','i': 'BTCF0/USTF0',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* 1.0045})
 }
-        */
+		*/
         }
     }
-    //console.log(await client.createOrder(  'ETH/USDT', "Limit", 'sell', 0.001, 8633))
+    //console.log(await client.createOrder(  'BTCF0/USTF0', "Limit", 'sell', 0.001, 8633))
 }, 10000)
 
 var dobuy = true;
@@ -547,9 +520,8 @@ async function doit() {
                         setTimeout(function() {
                             dobuy = true;
                         }, delaybetweenorder * 1000)
-signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', sell_price: prc} 
-            socket_client.emit("sell_signal", signal)
-                        openorders.push(await client.createOrder('ETH/USDT', "Limit", 'sell', qty, prc))
+
+                        openorders.push(await client.createOrder('BTCF0/USTF0', "Limit", 'sell', qty, prc, {'lev': leverage}))
 
                         //console.log(openorders)
                         console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' sell!') //ask
@@ -575,9 +547,8 @@ signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', s
                         setTimeout(function() {
                             dobuy = true;
                         }, delaybetweenorder * 1000)
-signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', buy_price: prc}
-                socket_client.emit("buy_signal", signal)
-                        openorders.push(await client.createOrder('ETH/USDT', "Limit", 'buy', qty, prc))
+
+                        openorders.push(await client.createOrder('BTCF0/USTF0', "Limit", 'buy', qty, prc))
 
                         //console.log(openorders)
 
@@ -591,6 +562,9 @@ signal = { key: bva_key, stratname: 'ETH 2.0 bit.ly/NeoNBot', pair: 'ETHUSDT', b
 
     
 }
+setInterval(function(){
+    doit()
+},delaybetweenorder *1000)
 setInterval(async function(){
 //ticker1 = await bitmex.fetchTicker('BTC/USD')
 
@@ -598,7 +572,7 @@ setInterval(async function(){
 //index=(ticker1.markPrice)
 
 
-request.get('https://www.bitmex.com/api/v1/instrument?symbol=ETHUSD', function (e, r, d){
+request.get('https://www.bitmex.com/api/v1/instrument?symbol=XBTUSD', function (e, r, d){
 try {
 j = JSON.parse(d)[0].lastPrice
 
@@ -611,13 +585,13 @@ catch (err){
 }
 })
 }, 4000)
-
-setInterval(function(){
-    doit()
-}, delaybetweenorder* 1000)
+/*setInterval(function(){
+    console.log(index)
+    console.log(price)
+}, 500) */
 /*
 ws.addStream('XBTUSD', 'instrument', async function(data, symbol, tableName) {
-    if (data[0].lastPrice != undefined){1
+    if (data[0].lastPrice != undefined){
     price = (data[0].lastPrice)
 }
     doit()
