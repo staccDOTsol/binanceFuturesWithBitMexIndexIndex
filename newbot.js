@@ -92,10 +92,10 @@ if (orders[o] == trades[t].orderId){
             if (go){
             tradesArr.push(trades[t].id)
   if (trades[t].side == 'SELL'){
-sellTps.push({qty: trades[t].qty, price: trades[t].price * (1 + (trailingTp / 100))})
+sellTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
 }
 else {
-buyTps.push({qty: trades[t].qty, price: trades[t].price * (1 - (trailingTp / 100))})
+buyTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
 
 }
             /*

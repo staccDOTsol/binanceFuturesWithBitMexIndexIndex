@@ -215,9 +215,9 @@ setInterval(async function() {
         }
         if (unrealized > takeProfit) {
             if (position > 0) {
-                await client.createOrder('ETH/USDT', "Limit", 'sell', position, LB - 100)
+                await client.createOrder('ETH/USDT', "Limit", 'sell', position, LB - 4)
             } else {
-                await client.createOrder('ETH/USDT', "Limit", 'buy', position * -1, HA + 100)
+                await client.createOrder('ETH/USDT', "Limit", 'buy', position * -1, HA + 4)
 
             }
         }
@@ -225,9 +225,9 @@ setInterval(async function() {
             console.log(unrealized)
 
             if (position > 0) {
-                await client.createOrder('ETH/USDT', "Limit", 'sell', position, LB - 100)
+                await client.createOrder('ETH/USDT', "Limit", 'sell', position, LB - 4)
             } else {
-                await client.createOrder('ETH/USDT', "Limit", 'buy', position * -1, HA + 100)
+                await client.createOrder('ETH/USDT', "Limit", 'buy', position * -1, HA + 4)
 
             }
         }
@@ -411,12 +411,12 @@ setInterval(async function() {
     var split = false;
     for (var t in tps) {
         if (tps[t].price <= price && tps[t].direction == 'sell') {
-            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 100))
+            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 4))
 
             split = true
         }
         if (tps[t].price >= price && tps[t].direction == 'buy') {
-            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'buy', tps[t].amt, tps[t].price - 100))
+            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'buy', tps[t].amt, tps[t].price - 4))
 
             split = true
         }
@@ -433,12 +433,12 @@ setInterval(async function() {
     split = false;
     for (var t in sls) {
         if (sls[t].price >= price && sls[t].direction == 'sell') {
-            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'sell', sls[t].amt, sls[t].price + 100))
+            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'sell', sls[t].amt, sls[t].price + 4))
 
             split = true
         }
         if (sls[t].price <= price && sls[t].direction == 'buy') {
-            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'buy', sls[t].amt, sls[t].price - 100))
+            sltps.push(await client.createOrder('ETH/USDT', "Limit", 'buy', sls[t].amt, sls[t].price - 4))
 
             split = true
         }
