@@ -14,6 +14,13 @@ if (debug == 'true'){
 else {
     debug = false
 }
+var log = process.env.log
+if (log == 'false'){
+    log = false
+}
+else {
+    log = true
+}
         const axios = require('axios')
 
 var request = require('request')
@@ -267,12 +274,15 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
   now: new Date().getTime(),
   bal_init: usd_init })
 .then((res) => {
+    if (log){
   console.log(`statusCode: ${res.statusCode}`)
+}
   //console.log(res)
 })
 .catch((error) => {
   console.error(error)
 })
+if (log){
 
         console.log(' ')
         console.log('-----')
@@ -296,6 +306,7 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
         }
         console.log('bal usd: ' + bal_usd)
         console.log('pnl usd: % ' + -1 * (1 - bal_usd / usd_init) * 100)
+        }
         pnlusd = -1 * (1 - bal_usd / usd_init) * 100
         if (pnlusd > ((min_withdrawal_percent * 100) * 2)) {
             var new_usd_init = bal_usd * (1 - (min_withdrawal_percent));
