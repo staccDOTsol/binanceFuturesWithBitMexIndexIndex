@@ -7,6 +7,7 @@ var mfiTF = 1
 var period = 54
 var kvalue = 5
 var dvalue = 3
+var doRequest = true
 var debug = process.env.debug
 if (debug == 'true'){
     debug = true
@@ -26,7 +27,7 @@ else {
 var request = require('request')
 
 async function getVars(){
-
+if (doRequest){
 request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
     try {
         j = JSON.parse(d)
@@ -40,6 +41,7 @@ request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
         console.log(err)
     }
 })
+}
 
 }
 getVars()
