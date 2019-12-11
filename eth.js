@@ -213,6 +213,9 @@ setInterval(async function() {
         if (position < 0) {
             unrealized = unrealized * -1
         }
+        console.log('unRealizedProfit: ' + unrealized)
+        console.log('tp: ' + takeProfit)
+        console.log('sl: ' + stopLoss)
         if (unrealized > takeProfit) {
             if (position > 0) {
                 await client.createOrder('ETH/USDT', "Limit", 'sell', position, LB - 4)
