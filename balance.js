@@ -5,7 +5,53 @@ const binance = require('node-binance-api')().options({
   useServerTime: true // If you get timestamp errors, synchronize to server time at startup
 });
 
+var PortfolioAnalytics = require ('portfolio-analytics')
+var avg = 0
+var high = 0
+async function dodds(){
+  start = btcs[0][0]
+                dds = {}
+                a = -1
+                for (var t =0; t<=btcs.length; t = t + 5){
+                if (btcs[t] != undefined){                d = btcs[t][0]
+                tf = d - 1000 * 60 * 60 * 24
+                a++
+                for (var btc  = 0; btc <= btcs.length; btc = btc + 5){
+                if (btcs[btc] != undefined){
+                if (btcs[btc][0] > tf && btcs[btc][0] < d){
+                if (dds[a] == undefined){
+                dds[a] = []
+                }
+                    dds[a].push((btcs[btc][1].toFixed(20)))
+                
+                
+                }
+                }
+                }
+                }
+                }
+                drawdowns = []
+                high = 0
+                for (var dd in dds){
+                drawdowns.push(PortfolioAnalytics.maxDrawdown(dds[dd]))
+                }
+                t = 0
+                for (var dd in drawdowns){
+                t+=drawdowns[dd]
+                if (drawdowns[dd] > high){
+                high = drawdowns[dd]
+                }
+                }
+                avg = t / drawdowns.length
+}
 
+setInterval(function(){
+dodds()
+}, 60 * 1000 * 5)
+
+setTimeout(function(){
+dodds()
+}, 60 * 1000)
 
 var btc = 0;
 const ccxt = require('ccxt')
@@ -71,7 +117,7 @@ app.set('view engine', 'ejs');
 app.listen(parseFloat(process.env.port) || 8081, function() {});
 app.get('/update', cors(), (req, res) => {
 
-    res.json({bal: bals, btc: btcs, qty: vol, pos: position})
+    res.json({avg: avg, high: high, bal: bals, btc: btcs, qty: vol, pos: position})
 
 })
 

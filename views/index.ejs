@@ -75,39 +75,9 @@
                 first = false;
                 fperc = jsondata.btcNow;
                 }
-                start = jsondata.btc[0][0]
-                dds = {}
-                a = -1
-                for (var t =0; t<=jsondata.bal.length; t = t + 5){
-                d = jsondata.bal[t][0]
-                tf = d - 1000 * 60 * 60 * 24
-                a++
-                for (var btc  = 0; btc <= jsondata.bal.length; btc = btc + 5){
-                if (jsondata.bal[btc][0] > tf && jsondata.bal[btc][0] < d){
-                if (dds[a] == undefined){
-                dds[a] = []
-                }
-                    dds[a].push((jsondata.bal[btc][1].toFixed(20)))
-                
-                
-                }
-                }
-                }
-                drawdowns = []
-                high = 0
-                for (var dd in dds){
-                drawdowns.push(PortfolioAnalytics.maxDrawdown(dds[dd]))
-                }
-                t = 0
-                for (var dd in drawdowns){
-                t+=drawdowns[dd]
-                if (drawdowns[dd] > high){
-                high = drawdowns[dd]
-                }
-                }
                 avg = t / drawdowns.length
-                $('#avgdd').html('Average Daily Drawdown: ' + (avg * 100).toPrecision(4) + '%')
-                $('#maxdd').html('Max. Daily Drawdown: ' + (high * 100).toPrecision(4) + '%')
+$('#avgdd').html('Average Daily Drawdown: ' + (jsondata.avg * 100).toPrecision(4) + '%')
+                $('#maxdd').html('Max. Daily Drawdown: ' + (jsondata.high * 100).toPrecision(4) + '%')
                 $('#pos').html('                                          ' +jsondata.pos + ' position')
                 $('#vol').html('                                          ' +jsondata.qty + ' BTC notional traded in recent memory')
                 asks= jsondata.btc; 
