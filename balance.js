@@ -9,20 +9,20 @@ var PortfolioAnalytics = require ('portfolio-analytics')
 var avg = 0
 var high = 0
 async function dodds(){
-  start = btcs[0][0]
+  start = btcbtc[0][0]
                 dds = {}
                 a = -1
-                for (var t =0; t<=btcs.length; t = t + 5){
-                if (btcs[t] != undefined){                d = btcs[t][0]
+                for (var t =0; t<=btcbtc.length; t = t + 5){
+                if (btcbtc[t] != undefined){                d = btcbtc[t][0]
                 tf = d - 1000 * 60 * 60 * 24
                 a++
-                for (var btc  = 0; btc <= btcs.length; btc = btc + 5){
-                if (btcs[btc] != undefined){
-                if (btcs[btc][0] > tf && btcs[btc][0] < d){
+                for (var btc  = 0; btc <= btcbtc.length; btc = btc + 5){
+                if (btcbtc[btc] != undefined){
+                if (btcbtc[btc][0] > tf && btcbtc[btc][0] < d){
                 if (dds[a] == undefined){
                 dds[a] = []
                 }
-                    dds[a].push((btcs[btc][1].toFixed(20)))
+                    dds[a].push((btcbtc[btc][1].toFixed(20)))
                 
                 
                 }
@@ -102,6 +102,7 @@ first = false;
 console.log(btcstart)
 console.log(btc)
 if (btc != 0){
+  btcbtc.push( [new Date().getTime(), btc])
 btcs.push( [new Date().getTime(), -1 * (1-(btc / btcstart)) * 100])
 bals.push([new Date().getTime(), btc])
 }
@@ -120,7 +121,7 @@ app.get('/update', cors(), (req, res) => {
     res.json({avg: avg, high: high, bal: bals, btc: btcs, qty: vol, pos: position})
 
 })
-
+var btcbtc = []
 app.get('/', (req, res) => {
         res.render('index.ejs', {
             btc: btc,
