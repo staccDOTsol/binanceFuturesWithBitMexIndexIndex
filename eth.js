@@ -207,11 +207,10 @@ setInterval(async function() {
     pos = await client.fapiPrivateGetPositionRisk()
     ticker = await client.fetchTicker('ETH/USDT')
     LB = ticker.last + 0.5
-    //console.log(await client.fetchTicker( 'ETH/USDT' ))
     HA = ticker.last - 0.5
-    if (pos[0] != undefined) {
-        position = parseFloat(pos[0]['positionAmt'])
-        unrealized = parseFloat(pos[0]['unRealizedProfit']) / (position * HA) * parseFloat(pos[0]['leverage']) * 100
+    if (pos[1] != undefined) {
+        position = parseFloat(pos[1]['positionAmt'])
+        unrealized = parseFloat(pos[1]['unRealizedProfit']) / (position * HA) * parseFloat(pos[1]['leverage']) * 100
         if (position < 0) {
             unrealized = unrealized * -1
         }
