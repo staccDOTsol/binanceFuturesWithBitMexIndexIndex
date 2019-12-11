@@ -1,6 +1,7 @@
 var lowRSI = 3.5
 var highRSI = 99
-var minCross = 0.0025
+var minCrossSell = 0.0025
+var minCrossBuy = 0.0025
 var useMFI = false
 var rsiTF = 1
 var mfiTF = 1
@@ -19,7 +20,8 @@ request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
         j = JSON.parse(d)
         lowRSI = parseFloat(j.lowRSI)
         highRSI = parseFloat(j.highRSI)
-        minCross = parseFloat(j.minCross)
+        minCrossSell = parseFloat(j.minCrossSell)
+        minCrossBuy = parseFloat(j.minCrossBuy)
         rsiTF = parseFloat(j.RSItf)
         period = parseFloat(j.RSIPeriod) 
     }
@@ -281,9 +283,9 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
         console.log('rsiover: ' + rsiover)
         console.log('rsibelow: ' + rsibelow)
         console.log('selldiff')
-        console.log(diff < -1 * minCross / 1.5)
+        console.log(diff < -1 * minCrossSell)
         console.log('buydiff')
-        console.log(diff > minCross && diff < 100000)
+        console.log(diff > minCrossBuy && diff < 100000)
         console.log('selling: ' + selling)
         console.log('buying: ' + buying)
         console.log('bal btc: ' + bal_btc)
@@ -514,7 +516,7 @@ async function doit() {
             }
             diff = price / index;
             diff = -1 * (1 - diff) * 100
-            if (diff < -1 * minCross / 1.5 && rsiover) { //} && (useMFI && mfiover)){
+            if (diff < -1 * minCrossSell && rsiover) { //} && (useMFI && mfiover)){
                 console.log('it wants to sell 1')
                 if (selling == 0){// && (freePerc < maxFreePerc || position > 0)) {
                     console.log('it wants to sell 2')
@@ -541,7 +543,7 @@ async function doit() {
                         console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' sell!') //ask
                     }
                 }
-            } else if (diff > minCross && diff < 100000 && rsibelow) { //} && (useMFI && mfibelow)){
+            } else if (diff > minCrossBuy && diff < 100000 && rsibelow) { //} && (useMFI && mfibelow)){
                 console.log('it wants to buy 1')
                 if (buying == 0){// && (freePerc < maxFreePerc || position < 0)) {
                     console.log('it wants to buy 2')

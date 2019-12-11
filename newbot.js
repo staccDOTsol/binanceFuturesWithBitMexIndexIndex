@@ -33,6 +33,8 @@ last = ticker.lastPrice;
 
 }
 for (var tp in buyTps){
+    console.log('last: ' + last)
+    console.log('last before that: ' + llast)
     console.log('buytp price: ' + buyTps[tp].price)
     if (llast < last){
         diff = last / llast
@@ -48,6 +50,8 @@ orders.push(parseFloat(o.id))
 }
 for (var tp in sellTps){
 
+    console.log('last: ' + last)
+    console.log('last before that: ' + llast)
     console.log('selltp price: ' + sellTps[tp].price)
     if (llast > last){
         diff = last / llast
