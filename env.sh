@@ -22,7 +22,8 @@ export key=
 export secret=
 export ethkey=
 export ethsecret=
-
+export doWithdraw=true
+export min_withdrawal_percent=0.025
 windows
 
 
@@ -50,3 +51,5 @@ setx maxFreePerc "0.9"
 setx ethmaxFreePerc "0.9"
 setx orderSizeMult "1"
 setx ethorderSizeMult "1"
+setx doWithdraw "true"
+setx min_withdrawal_percent "0.025"

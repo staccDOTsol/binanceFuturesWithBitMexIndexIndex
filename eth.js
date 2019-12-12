@@ -38,7 +38,13 @@ getVars()
 var delaybetweenorder = 0.85 //sec
 var takeProfit = parseFloat(process.env.ethtakeProfit) //%
 var stopLoss = parseFloat(process.env.ethstopLoss) //%
-var min_withdrawal_percent = 0.025
+var min_withdrawal_percent = parseFloat(process.env.min_withdrawal_percent)
+var doWithdraw = process.env.doWithdraw
+if (doWithdraw == 'true'){
+    doWithdraw = true;
+}else {
+    doWithdraw = false
+}
 var key=process.env.ethkey
 var tgUser=process.env.ethtgUser
 var secret=process.env.ethsecret
@@ -292,6 +298,7 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
         console.log('bal usd: ' + bal_usd)
         console.log('pnl usd: % ' + -1 * (1 - bal_usd / usd_init) * 100)
         pnlusd = -1 * (1 - bal_usd / usd_init) * 100
+        if (doWithdraw){
         if (pnlusd > ((min_withdrawal_percent * 100) * 2)) {
             var new_usd_init = bal_usd * (1 - (min_withdrawal_percent));
             binance.mgTransferMarginToMain('USDT', (min_withdrawal_percent) * bal_usd, (error, response) => {
@@ -304,6 +311,7 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
                 }
             });
         }
+    }
         console.log('RSI: ' + theRSI[theRSI.length - 1].k)
         console.log('MFI: ' + theMFI[theMFI.length - 1])
       console.log('diff: ' + diff)
