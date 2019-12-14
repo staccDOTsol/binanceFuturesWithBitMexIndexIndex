@@ -6,8 +6,10 @@ var useMFI = false
 var rsiTF = 1
 var mfiTF = 1
 var period = 54
-var last;
-var llast;
+var buyTps = []
+var last
+var llast
+var sellTps = []
 var kvalue = 5
 var dvalue = 3
 var trailingTp = 0.2
