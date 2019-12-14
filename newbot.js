@@ -1,6 +1,6 @@
 var secret=process.env.secret
 var key=process.env.key
-var dollars = 5
+var dollars = 50
 const ccxt = require('ccxt')
 var buyTps = []
 var sellTps = []
@@ -95,14 +95,7 @@ if (orders[o] == trades[t].orderId){
             }
             if (go){
             tradesArr.push(trades[t].id)
-  if (trades[t].side == 'SELL'){
-sellTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
-}
-else {
-buyTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
 
-}
-            /*
 qty = parseFloat(trades[t].qty)
 price = parseFloat(trades[t].price)
 if (trades[t].side == 'SELL'){
@@ -115,7 +108,6 @@ else {
     orders.push(parseFloat(o.id))
     console.log(orders)
 }
-*/
 }
         }
         }

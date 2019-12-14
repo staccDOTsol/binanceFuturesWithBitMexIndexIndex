@@ -6,13 +6,62 @@ var useMFI = false
 var rsiTF = 1
 var mfiTF = 1
 var period = 54
+var last;
+var llast;
 var kvalue = 5
 var dvalue = 3
-
+var trailingTp = 0.2
+trailingTp = parseFloat(process.env.trailingTp)
         const axios = require('axios')
 
 var request = require('request')
+setInterval(async function(){
+    try{
+ticker = await client.fetchTicker('BTC/USDT')
 
+llast = last
+last = ticker.last
+}
+catch(err){
+
+    console.log(err)
+}
+
+for (var tp in buyTps){
+    console.log('last: ' + last)
+    console.log('llast: ' + llast)
+    if (llast < last){
+        diff = last / llast
+        buyTps[tp].price = parseFloat(buyTps[tp].price) * diff
+    console.log('last: ' + last)
+    console.log('llast: ' + last)
+    console.log('diff: ' + diff)
+    console.log('buytpstpprice: ' + buyTps[tp].price)
+    } else{
+        if (buyTps[tp].price > last){
+            console.log('exit buy tp, price: ' + last + ' and buyTp price: ' + buyTps[tp].price)
+            var o = await client.createOrder('BTC/USDT', "Limit", 'sell', buyTps[tp].qty, buyTps[tp].price - 100)
+orders.push(parseFloat(o.id))
+            buyTps.splice(buyTps[tp], 1)
+        }
+    }
+}
+for (var tp in sellTps){
+
+    if (llast > last){
+        diff = last / llast
+        sellTps[tp].price = sellTps[tp].price * diff
+    } else{
+        if (sellTps[tp].price < last){
+            console.log('exit sell tp, price: ' + last + ' and sellTps price: ' + sellTps[tp].price)
+            var o = await client.createOrder('BTC/USDT', "Limit", 'buy', sellTps[tp].qty, sellTps[tp].price + 100)
+orders.push(parseFloat(o.id))
+            sellTps.splice(sellTps[tp], 1)
+        }
+    }
+}
+
+}, 5000)
 async function getVars(){
 
 request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
@@ -477,6 +526,14 @@ setInterval(async function() {
         }
         if (!tradesArr.includes(trades[t].id) && go) {
             tradesArr.push(trades[t].id)
+
+if (trades[t].side == 'SELL'){
+sellTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
+}
+else {
+buyTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
+
+}
             /*
 	console.log(' ')
 				console.log('enter tp!')

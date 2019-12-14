@@ -1,19 +1,19 @@
-var lowRSI = 3.5
-var highRSI = 99
-var minCrossSell = 0.0025
-var minCrossBuy = 0.0025
+var username = "jaredunn",
+    password = "Melani3B4b%",
+    auth = "Basic " + new Buffer(username + ":" + password).toString("base64");
+
+
+var lowRSI = 20
+var highRSI = 80
+var minCrossSell = 0.1
+var minCrossBuy = 0.1
 var useMFI = false
 var rsiTF = 1
 var mfiTF = 1
-var trailingTp = 0.2
-trailingTp = parseFloat(process.env.trailingTp)
 var period = 54
-var buyTps = []
-
-var sellTps = []
 var kvalue = 5
 var dvalue = 3
-var doRequest = true
+var doRequest = false
 var debug = process.env.debug
 if (debug == 'true'){
     debug = true
@@ -31,53 +31,14 @@ else {
         const axios = require('axios')
 
 var request = require('request')
-setInterval(async function(){
-    try{
-ticker = await client.fetchTicker('BTC/USDT')
-
-llast = last
-last = ticker.last
-}
-catch(err){
-
-    console.log(err)
-}
-
-for (var tp in buyTps){
-    console.log('last: ' + last)
-    console.log('llast: ' + llast)
-    if (llast < last){
-        diff = last / llast
-        buyTps[tp].price = parseFloat(buyTps[tp].price) * diff
-    console.log('last: ' + last)
-    console.log('llast: ' + last)
-    console.log('diff: ' + diff)
-    console.log('buytpstpprice: ' + buyTps[tp].price)
-    } else{
-        if (buyTps[tp].price > last){
-            console.log('exit buy tp, price: ' + last + ' and buyTp price: ' + buyTps[tp].price)
-            var o = await client.createOrder('BTC/USDT', "Limit", 'sell', buyTps[tp].qty, buyTps[tp].price - 100)
-orders.push(parseFloat(o.id))
-            buyTps.splice(buyTps[tp], 1)
-        }
-    }
-}
-for (var tp in sellTps){
-
-    if (llast > last){
-        diff = last / llast
-        sellTps[tp].price = sellTps[tp].price * diff
-    } else{
-        if (sellTps[tp].price < last){
-            console.log('exit sell tp, price: ' + last + ' and sellTps price: ' + sellTps[tp].price)
-            var o = await client.createOrder('BTC/USDT', "Limit", 'buy', sellTps[tp].qty, sellTps[tp].price + 100)
-orders.push(parseFloat(o.id))
-            sellTps.splice(sellTps[tp], 1)
-        }
-    }
-}
-
-}, 5000)
+const req = request({
+    method: "GET",
+    url: 'http://tradingserver.zulutrade.com/stream',
+    json: true,
+    forever: true
+}).on("data", function (e, r, d){
+console.log(d)
+});
 async function getVars(){
 if (doRequest){
 request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
@@ -101,29 +62,20 @@ getVars()
 setInterval(async function(){
 getVars()
 }, 1000 * 60 * 60 * 4)
-var delaybetweenorder = 0.85 //sec
+var delaybetweenorder = 60//sec
 var takeProfit = parseFloat(process.env.takeProfit) //%
 var stopLoss = parseFloat(process.env.stopLoss) //%
 var min_withdrawal_percent = parseFloat(process.env.min_withdrawal_percent) 
 var key=process.env.key
 var tgUser=process.env.tgUser
 var secret=process.env.secret
-var keygood = false;
-request.get("https://docs.google.com/spreadsheets/d/1IIrLxqGeL1PI8S42MDEk_Rposg1h6Xwaeaj8-nGr54g/gviz/tq?tqx=out:json&sheet=Sheet1",async function(e, r, d) {
-        if (d.includes(key.substring(key.length-6, key.length))) {
-keygood = true;
-console.log('keygood')
-            }
-        })
+var keygood = true;
+
 var maxFreePerc = parseFloat(process.env.maxFreePerc)
 var orderSizeMult = parseFloat(process.env.orderSizeMult)
 const ccxt = require('ccxt')
 var bitmex = new ccxt.bitmex()
-const binance = require('./node-binance-api')().options({
-  APIKEY: key,
-  APISECRET: secret,
-  useServerTime: true // If you get timestamp errors, synchronize to server time at startup
-});
+
 var doWithdraw = process.env.doWithdraw
 if (doWithdraw == 'true'){
     doWithdraw = true
@@ -132,20 +84,6 @@ if (doWithdraw == 'true'){
 }
 var withdrawMin 
 
-var client = new ccxt.binance({
-    "apiKey": key,
-    "secret": secret,
-    "options": {
-        "defaultMarket": "futures"
-    },
-    'enableRateLimit': true,
-    'urls': {
-        'api': {
-            'public': 'https://fapi.binance.com/fapi/v1',
-            'private': 'https://fapi.binance.com/fapi/v1',
-        },
-    }
-})
 var client2 = new ccxt.binance({
     "options": {
         "defaultMarket": "futures"
@@ -164,56 +102,42 @@ var HA;
 var bal_usd;
 var usd_init;
 var bal_btc;
-cancelall()
-async function cancelallbyorderstatus() {
-    ords = await client.fetchOpenOrders('BTC/USDT')
-
-    for (var order in ords) {
-        oid = ords[order]['info']['orderId']
-        side = ords[order]['side']
-        for (var o in openorders) {
-            if (parseFloat(oid) == parseFloat(openorders[o].id)) {
-                //if (buysell == 1 && side == 'buy'){
-                //	console.log('cancelling..')
-                try {
-                    await client.cancelOrder(oid, 'BTC/USDT')
-                } catch (e) {
-                    console.log(e)
-
-                }
-            }
-
-        }
-        //}
-        /* else if (buysell = 0 && side == 'sell'){
-         	try{
-                 await client.cancelOrder( oid , 'BTC/USDT' )
-             }
-             catch (e){
-                 console.log(e)
-             
-             }
-         }*/
-    }
-}
+//cancelall()
 async function cancelall() {
-    ords = await client.fetchOpenOrders('BTC/USDT')
-
-    for (var order in ords) {
+    request(
+    {
+        url : 'http://tradingserver.zulutrade.com/getOpen',
+        headers : {
+            "Authorization" : auth
+        }
+    },
+    function (error, response, body) {
+       ords = JSON.parse(body).openOrders
+           for (var order in ords) {
         if (true) {
-            oid = ords[order]['id']
-            side = ords[order]['side']
+            oid = ords[order]['uniqueId']
             //if (buysell == 1 && side == 'buy'){
-            //	console.log('cancelleing2...')
+            //  console.log('cancelleing2...')
             try {
-                await client.cancelOrder(oid, 'BTC/USDT')
+
+url = 'http://tradingserver.zulutrade.com/close/pending/?currencyName=BTCUSD&lots=' + ords[order].lots + '&buy=' + ords[order].buy + '&uniqueId=' + oid
+        request(
+    {
+        url : url,
+        headers : {
+            "Authorization" : auth
+        }
+    },
+    function (error, response, body) {
+
+    })
             } catch (e) {
                 console.log(e)
 
             }
             //}
             /* else if (buysell = 0 && side == 'sell'){
-             	try{
+                try{
                      await client.cancelOrder( oid , 'BTC/USDT' )
                  }
                  catch (e){
@@ -223,21 +147,30 @@ async function cancelall() {
              }*/
         }
     }
+    }
+);
+    
+
+
 }
 var initial_bal;
 first = true;
 var freePerc;
 var position = 0;
 setInterval(async function() {
+    ticker = await client2.fetchTicker('BTC/USDT')
+    LB = ticker.last + 0.5
+    //console.log(await client.fetchTicker( 'BTC/USDT' ))
+    HA = ticker.last - 0.5
     if (first) {
-        var trades = await client.fapiPrivateGetUserTrades({
-            'symbol': 'BTCUSDT',
+        /* var trades = await client.fapiPrivateGetUserTrades({
+            'symbol': 'BTC/USDT',
             'limit': 1000
         })
         for (var t in trades) {
             tradesArr.push(trades[t].id)
-        }
-        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 74, params = {})
+        } */
+        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = '1h', since = undefined, limit = 74, params = {})
         //console.log(ohlcv)
         var c = 0;
         for (var b in ohlcv) {
@@ -250,7 +183,7 @@ setInterval(async function() {
                 rsis[0].shift()
             }
         }
-        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
+        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = '1h', since = undefined, limit = 1000, params = {})
         //console.log(ohlcv)
         high = []
         low = []
@@ -281,43 +214,95 @@ setInterval(async function() {
         });
         //console.log(theMFI[theMFI.length-1])
     }
-    pos = await client.fapiPrivateGetPositionRisk()
-    ticker = await client.fetchTicker('BTC/USDT')
-    LB = ticker.last + 0.5
-    //console.log(await client.fetchTicker( 'BTC/USDT' ))
-    HA = ticker.last - 0.5
-    if (pos[0] != undefined) {
-        position = parseFloat(pos[0]['positionAmt'])
-        unrealized = parseFloat(pos[0]['unRealizedProfit']) / (position * HA) * parseFloat(pos[0]['leverage']) * 100
-        if (position < 0) {
-            unrealized = unrealized * -1
+    request(
+    {
+        url : 'http://tradingserver.zulutrade.com/getOpen',
+        headers : {
+            "Authorization" : auth
         }
+    },
+    async function (error, response, body) {
+       pos = JSON.parse(body).openPositions
+    
+    if (pos[0] != undefined) {
+        position = parseFloat(pos[0]['lots'])
+        if (pos[0].buy == false){
+            position = position * -1;
+        }
+        unrealized = parseFloat(pos[0]['floatingPnl']) /  HA 
+        
         if (unrealized > takeProfit) {
             if (position > 0) {
-                await client.createOrder('BTC/USDT', "Limit", 'sell', position, LB - 100)
-            } else {
-                await client.createOrder('BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
-
+                uid = Math.random() * 10000 * 10000 * 10000 * 10000
+                uid = Math.floor(uid)
+url = 'http://tradingserver.zulutrade.com/open/market/?currencyName=BTCUSD&lots=' + position + '&buy=false&requestedPrice=' + (LB - 100) + '&uniqueId=' + uid
+request(
+    {
+        url : url,
+        headers : {
+            "Authorization" : auth
+        }
+    },
+    function (error, response, body) {
+  if (error) console.log(error)          
+})
+              } else {
+uid = Math.random() * 10000 * 10000 * 10000 * 10000
+                uid = Math.floor(uid)
+url = 'http://tradingserver.zulutrade.com/open/market/?currencyName=BTCUSD&lots=' + (position * -1) + '&buy=true&requestedPrice=' + (LB + 100) + '&uniqueId=' + uid
+request(
+    {
+        url : url,
+        headers : {
+            "Authorization" : auth
+        }
+    },
+    function (error, response, body) {
+  if (error) console.log(error)          
+})
             }
         }
         if (unrealized < stopLoss) {
             console.log(unrealized)
-
-            if (position > 0) {
-                await client.createOrder('BTC/USDT', "Limit", 'sell', position, LB - 100)
-            } else {
-                await client.createOrder('BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
-
+if (position > 0) {
+                uid = Math.random() * 10000 * 10000 * 10000 * 10000
+                uid = Math.floor(uid)
+url = 'http://tradingserver.zulutrade.com/open/market/?currencyName=BTCUSD&lots=' + position + '&buy=false&requestedPrice=' + (LB - 100) + '&uniqueId=' + uid
+request(
+    {
+        url : url,
+        headers : {
+            "Authorization" : auth
+        }
+    },
+    function (error, response, body) {
+  if (error) console.log(error)          
+})
+              } else {
+uid = Math.random() * 10000 * 10000 * 10000 * 10000
+                uid = Math.floor(uid)
+url = 'http://tradingserver.zulutrade.com/open/market/?currencyName=BTCUSD&lots=' + (position * -1) + '&buy=true&requestedPrice=' + (LB + 100) + '&uniqueId=' + uid
+request(
+    {
+        url : url,
+        headers : {
+            "Authorization" : auth
+        }
+    },
+    function (error, response, body) {
+  if (error) console.log(error)          
+})
             }
         }
     }
+})
     //console.log(position)
-    account = await client.fetchBalance()
-    	maxwithdrawamt=parseFloat(account.info.assets[0].maxWithdrawAmount)
-    free_btc = parseFloat(account['info']['totalInitialMargin']) / HA
+    //account = await client.fetchBalance()
+    	maxwithdrawamt=50000
+    free_btc = 50000 / HA
 
-    bal_btc = parseFloat(account['info']['totalMarginBalance']) / HA
-    bal_usd = parseFloat(account['info']['totalMarginBalance'])
+    bal_btc = 50000 / HA
+    bal_usd = 50000
 
 
     freePerc = (maxwithdrawamt / bal_usd)
@@ -331,7 +316,9 @@ setInterval(async function() {
         qtybtc = bal_btc * 50 / 50
         qty = Math.floor(HA * qtybtc / 10) / HA
         qty = qty * orderSizeMult
+                    qty = Math.ceil(qty)
      console.log('qty: ' + qty)
+     console.log('HA: ' + HA)
     }
 
     if (count >= 4 * 6 * 1) {
@@ -380,15 +367,7 @@ if (log){
         if (doWithdraw){
         if (pnlusd > ((min_withdrawal_percent * 100) * 2)) {
             var new_usd_init = bal_usd * (1 - (min_withdrawal_percent));
-            binance.mgTransferMarginToMain('USDT', (min_withdrawal_percent) * bal_usd, (error, response) => {
-                if (error) {
-                    console.log(error)
-                } else {
 
-                    usd_init = new_usd_init
-                    initial_bal = usd_init / LB;
-                }
-            });
         }
         }
         cancelall()
@@ -410,7 +389,7 @@ var buysell = -1
 var theRSI = []
 var theMFI = []
 setInterval(async function() {
-    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
+    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = '1h', since = undefined, limit = 1000, params = {})
     //console.log(ohlcv)
     var c = 0;
     for (var b in ohlcv) {
@@ -431,7 +410,7 @@ setInterval(async function() {
         values: rsis[0]
     });
     //console.log(theRSI[theRSI.length-1].k)
-    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 17, params = {})
+    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = '1h', since = undefined, limit = 17, params = {})
     high = []
     low = []
     close = []
@@ -495,103 +474,6 @@ var sls = []
 var tradesArr = []
 var sltps = []
 var openorders = []
-setInterval(async function() {
-    var split = false;
-    for (var t in tps) {
-        if (tps[t].price <= price && tps[t].direction == 'sell') {
-            sltps.push(await client.createOrder('BTC/USDT', "Limit", 'sell', tps[t].amt, tps[t].price + 100))
-
-            split = true
-        }
-        if (tps[t].price >= price && tps[t].direction == 'buy') {
-            sltps.push(await client.createOrder('BTC/USDT', "Limit", 'buy', tps[t].amt, tps[t].price - 100))
-
-            split = true
-        }
-
-
-    }
-    if (split) {
-
-        tps.splice(t, 1)
-        sls.splice(t, 1)
-
-    }
-
-    split = false;
-    for (var t in sls) {
-        if (sls[t].price >= price && sls[t].direction == 'sell') {
-            sltps.push(await client.createOrder('BTC/USDT', "Limit", 'sell', sls[t].amt, sls[t].price + 100))
-
-            split = true
-        }
-        if (sls[t].price <= price && sls[t].direction == 'buy') {
-            sltps.push(await client.createOrder('BTC/USDT', "Limit", 'buy', sls[t].amt, sls[t].price - 100))
-
-            split = true
-        }
-
-
-    }
-    if (split) {
-        tps.splice(t, 1)
-        sls.splice(t, 1)
-
-    }
-    var trades = await client.fapiPrivateGetUserTrades({
-        'symbol': 'BTCUSDT',
-        'limit': 1000
-    })
-    //console.log(trades)
-    //console.log(tradesArr)
-    for (var t in trades) {
-        go = true;
-        for (var s in sltps) {
-            if (sltps[s].id == trades[t].orderId) {
-                go = false;
-            }
-        }
-        if (!tradesArr.includes(trades[t].id) && go) {
-            tradesArr.push(trades[t].id)
-
-if (trades[t].side == 'SELL'){
-sellTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
-}
-else {
-buyTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
-
-}
-            /*
-	console.log(' ')
-				console.log('enter tp!')
-				console.log(' ')
-				console.log(openorders)
-				if (trades[t].side == 'SELL'){
-					
-
-					sls.push({'direction': 'buy','i': 'BTC/USDT',
-  'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 1.0045})
-
-					tps.push({'direction': 'buy','i': 'BTC/USDT',
-  'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* (1-0.0025)})
-
-				}
-				else {
-sls.push({'direction': 'sell','i': 'BTC/USDT',
-  'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* (1-0.0045)})
-
-					tps.push({'direction': 'sell','i': 'BTC/USDT',
-  'amt': parseFloat(trades[t].qty),
- 'price': parseFloat(trades[t].price)* 1.0045})
-}
-		*/
-        }
-    }
-    //console.log(await client.createOrder(  'BTC/USDT', "Limit", 'sell', 0.001, 8633))
-}, 10000)
 
 var dobuy = true;
 var ohlcvs = []
@@ -618,6 +500,7 @@ async function doit() {
                     qtybtc = bal_btc * 50 / 50
                     qty = Math.floor(prc * qtybtc / 10) / HA
                     qty = qty * orderSizeMult
+                    qty = Math.ceil(qty)
                     if (position > 0) {
                         qty = qty * 2
                     }
@@ -628,8 +511,19 @@ async function doit() {
                             dobuy = true;
                         }, delaybetweenorder * 1000)
 
-                        openorders.push(await client.createOrder('BTC/USDT', "Limit", 'sell', qty, prc))
-
+                uid = Math.random() * 10000 * 10000 * 10000 * 10000
+                uid = Math.floor(uid)
+url = 'http://tradingserver.zulutrade.com/open/market/?currencyName=BTCUSD&lots=' + (qty) + '&buy=false&requestedPrice=' + (prc) + '&uniqueId=' + uid
+request(
+    {
+        url : url,
+        headers : {
+            "Authorization" : auth
+        }
+    },
+    function (error, response, body) {
+  if (error) console.log(error)          
+})
                         //console.log(openorders)
                         console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' sell!') //ask
                     }
@@ -645,6 +539,7 @@ async function doit() {
                     qtybtc = bal_btc * 50 / 50
                     qty = Math.floor(prc * qtybtc / 10) / LB
                     qty = qty * orderSizeMult
+                    qty = Math.ceil(qty)
                     if (position < 0) {
                         qty = qty * 2
                     }
@@ -655,8 +550,19 @@ async function doit() {
                             dobuy = true;
                         }, delaybetweenorder * 1000)
 
-                        openorders.push(await client.createOrder('BTC/USDT', "Limit", 'buy', qty, prc))
-
+                uid = Math.random() * 10000 * 10000 * 10000 * 10000
+                uid = Math.floor(uid)
+url = 'http://tradingserver.zulutrade.com/open/market/?currencyName=BTCUSD&lots=' + (qty) + '&buy=true&requestedPrice=' + (prc) + '&uniqueId=' + uid
+request(
+    {
+        url : url,
+        headers : {
+            "Authorization" : auth
+        }
+    },
+    function (error, response, body) {
+  if (error) console.log(error)          
+})
                         //console.log(openorders)
 
                         console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' buy!') //bid
@@ -671,9 +577,9 @@ async function doit() {
 }
 setInterval(function(){
     doit()
-},delaybetweenorder *1000)
+},1 *1000)
 setInterval(async function(){
-//ticker1 = await bitmex.fetchTicker('BTC/USD')
+//ticker1 = await bitmex.fetchTicker('BTCUSD')
 
 //price = ticker1.lastPrice
 //index=(ticker1.markPrice)
