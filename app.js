@@ -9,7 +9,8 @@ var trailingTp = 0.2
 trailingTp = parseFloat(process.env.trailingTp)
 var period = 54
 var buyTps = []
-
+var last
+var llast
 var sellTps = []
 var kvalue = 5
 var dvalue = 3
