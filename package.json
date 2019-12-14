@@ -7,11 +7,16 @@
     "start": "node telegram.js"
   },
   "dependencies": {
-    "axios": "*",
+    "axios": "^0.19.0",
     "body-parser": "*",
+    "ccxt": "^1.20.80",
+    "ejs": "*",
     "express": "*",
+    "https-proxy-agent": "^4.0.0",
+    "node-binance-api": "file:node-binance-api",
     "request": "^2.88.0",
-    "ejs": "*"
+    "socks-proxy-agent": "^4.0.2",
+    "ws": "^7.2.1"
   },
   "license": "MIT"
 }
