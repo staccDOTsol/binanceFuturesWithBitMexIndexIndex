@@ -38,7 +38,7 @@ catch(err){
 for (var tp in buyTps){
     console.log('last: ' + last)
     console.log('llast: ' + llast)
-    if (llast < last && last > sellTps[t].entry){
+    if (llast < last){
         diff = last / llast
         buyTps[tp].price = parseFloat(buyTps[tp].price) * diff
     console.log('last: ' + last)
@@ -46,7 +46,7 @@ for (var tp in buyTps){
     console.log('diff: ' + diff)
     console.log('buytpstpprice: ' + buyTps[tp].price)
     } else{
-        if (buyTps[tp].price > last){
+        if (last > buyTps[tp].entry && buyTps[tp].price > last ){
             console.log('exit buy tp, price: ' + last + ' and buyTp price: ' + buyTps[tp].price)
             var o = await client.createOrder('BTC/USDT', "Limit", 'sell', buyTps[tp].qty, buyTps[tp].price - 100)
 orders.push(parseFloat(o.id))
@@ -56,11 +56,11 @@ orders.push(parseFloat(o.id))
 }
 for (var tp in sellTps){
 
-    if (llast > last && last < sellTps[t].entry){
+    if (llast > last){
         diff = last / llast
         sellTps[tp].price = sellTps[tp].price * diff
     } else{
-        if (sellTps[tp].price < last){
+        if (sellTps[tp].price < last && last < sellTps[tp].entry){
             console.log('exit sell tp, price: ' + last + ' and sellTps price: ' + sellTps[tp].price)
             var o = await client.createOrder('BTC/USDT', "Limit", 'buy', sellTps[tp].qty, sellTps[tp].price + 100)
 orders.push(parseFloat(o.id))

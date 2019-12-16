@@ -55,7 +55,7 @@ for (var tp in buyTps){
     console.log('diff: ' + diff)
     console.log('buytpstpprice: ' + buyTps[tp].price)
     } else{
-        if (buyTps[tp].price > last){
+        if (buyTps[tp].price > last && buyTps[tp].price > last ){
             console.log('exit buy tp, price: ' + last + ' and buyTp price: ' + buyTps[tp].price)
             var o = await client.createOrder('BTC/USDT', "Limit", 'sell', buyTps[tp].qty, buyTps[tp].price - 100)
 orders.push(parseFloat(o.id))
@@ -69,7 +69,7 @@ for (var tp in sellTps){
         diff = last / llast
         sellTps[tp].price = sellTps[tp].price * diff
     } else{
-        if (sellTps[tp].price < last){
+        if (sellTps[tp].price < last  && last < sellTps[tp].entry){
             console.log('exit sell tp, price: ' + last + ' and sellTps price: ' + sellTps[tp].price)
             var o = await client.createOrder('BTC/USDT', "Limit", 'buy', sellTps[tp].qty, sellTps[tp].price + 100)
 orders.push(parseFloat(o.id))
@@ -175,7 +175,7 @@ async function cancelallbyorderstatus() {
         for (var o in openorders) {
             if (parseFloat(oid) == parseFloat(openorders[o].id)) {
                 //if (buysell == 1 && side == 'buy'){
-                //	console.log('cancelling..')
+                //  console.log('cancelling..')
                 try {
                     await client.cancelOrder(oid, 'BTC/USDT')
                 } catch (e) {
@@ -187,7 +187,7 @@ async function cancelallbyorderstatus() {
         }
         //}
         /* else if (buysell = 0 && side == 'sell'){
-         	try{
+            try{
                  await client.cancelOrder( oid , 'BTC/USDT' )
              }
              catch (e){
@@ -205,7 +205,7 @@ async function cancelall() {
             oid = ords[order]['id']
             side = ords[order]['side']
             //if (buysell == 1 && side == 'buy'){
-            //	console.log('cancelleing2...')
+            //  console.log('cancelleing2...')
             try {
                 await client.cancelOrder(oid, 'BTC/USDT')
             } catch (e) {
@@ -214,7 +214,7 @@ async function cancelall() {
             }
             //}
             /* else if (buysell = 0 && side == 'sell'){
-             	try{
+                try{
                      await client.cancelOrder( oid , 'BTC/USDT' )
                  }
                  catch (e){
@@ -318,7 +318,7 @@ setInterval(async function() {
     }
     //console.log(position)
     account = await client.fetchBalance()
-    	maxwithdrawamt=parseFloat(account.info.assets[0].maxWithdrawAmount)
+        maxwithdrawamt=parseFloat(account.info.assets[0].maxWithdrawAmount)
     free_btc = parseFloat(account['info']['totalInitialMargin']) / HA
 
     bal_btc = parseFloat(account['info']['totalMarginBalance']) / HA
@@ -560,39 +560,39 @@ setInterval(async function() {
             tradesArr.push(trades[t].id)
 
 if (trades[t].side == 'SELL'){
-sellTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
+sellTps.push({entry: parseFloat(trades[t].price),qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
 }
 else {
-buyTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
+buyTps.push({entry: parseFloat(trades[t].price),qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
 
 }
             /*
-	console.log(' ')
-				console.log('enter tp!')
-				console.log(' ')
-				console.log(openorders)
-				if (trades[t].side == 'SELL'){
-					
+    console.log(' ')
+                console.log('enter tp!')
+                console.log(' ')
+                console.log(openorders)
+                if (trades[t].side == 'SELL'){
+                    
 
-					sls.push({'direction': 'buy','i': 'BTC/USDT',
+                    sls.push({'direction': 'buy','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* 1.0045})
 
-					tps.push({'direction': 'buy','i': 'BTC/USDT',
+                    tps.push({'direction': 'buy','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* (1-0.0025)})
 
-				}
-				else {
+                }
+                else {
 sls.push({'direction': 'sell','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* (1-0.0045)})
 
-					tps.push({'direction': 'sell','i': 'BTC/USDT',
+                    tps.push({'direction': 'sell','i': 'BTC/USDT',
   'amt': parseFloat(trades[t].qty),
  'price': parseFloat(trades[t].price)* 1.0045})
 }
-		*/
+        */
         }
     }
     //console.log(await client.createOrder(  'BTC/USDT', "Limit", 'sell', 0.001, 8633))
