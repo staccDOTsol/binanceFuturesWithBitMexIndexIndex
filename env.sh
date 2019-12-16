@@ -2,6 +2,8 @@ linux
 export delaybetweenorder=0.5
 export takeProfit=9.5
 export stopLoss=-36.5
+export trailingTp=9.5
+export ethtrailingTp=-36.5
 export ethdelaybetweenorder=0.5
 export ethtakeProfit=.5
 export ethstopLoss=-36.5

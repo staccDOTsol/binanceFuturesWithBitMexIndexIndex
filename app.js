@@ -300,6 +300,8 @@ setInterval(async function() {
                 await client.createOrder('BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
 
             }
+            sellTps.shift()
+            buyTps.shift()
         }
         if (unrealized < stopLoss) {
             console.log(unrealized)
@@ -310,6 +312,8 @@ setInterval(async function() {
                 await client.createOrder('BTC/USDT', "Limit", 'buy', position * -1, HA + 100)
 
             }
+            sellTps.shift()
+            buyTps.shift()
         }
     }
     //console.log(position)
