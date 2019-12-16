@@ -25,20 +25,26 @@ var tradesArr = []
 var trades
 setInterval(async function(){
     try{
-    ticker = await client.fetchTicker('BTC/USDT')
-llast = last;
-last = ticker.lastPrice;
-} catch (err){
-    console.log(err)
+ticker = await client.fetchTicker('BTC/USDT')
 
+llast = last
+last = ticker.last
 }
+catch(err){
+
+    console.log(err)
+}
+
 for (var tp in buyTps){
     console.log('last: ' + last)
-    console.log('last before that: ' + llast)
-    console.log('buytp price: ' + buyTps[tp].price)
+    console.log('llast: ' + llast)
     if (llast < last){
         diff = last / llast
-        buyTps[tp].price = buyTps[tp].price * diff
+        buyTps[tp].price = parseFloat(buyTps[tp].price) * diff
+    console.log('last: ' + last)
+    console.log('llast: ' + last)
+    console.log('diff: ' + diff)
+    console.log('buytpstpprice: ' + buyTps[tp].price)
     } else{
         if (buyTps[tp].price > last){
             console.log('exit buy tp, price: ' + last + ' and buyTp price: ' + buyTps[tp].price)
@@ -50,9 +56,6 @@ orders.push(parseFloat(o.id))
 }
 for (var tp in sellTps){
 
-    console.log('last: ' + last)
-    console.log('last before that: ' + llast)
-    console.log('selltp price: ' + sellTps[tp].price)
     if (llast > last){
         diff = last / llast
         sellTps[tp].price = sellTps[tp].price * diff
@@ -65,7 +68,8 @@ orders.push(parseFloat(o.id))
         }
     }
 }
-}, 15000)
+
+}, 5000)
 var last
 var llast
 setTimeout(async function(){
@@ -96,17 +100,12 @@ if (orders[o] == trades[t].orderId){
             if (go){
             tradesArr.push(trades[t].id)
 
-qty = parseFloat(trades[t].qty)
-price = parseFloat(trades[t].price)
 if (trades[t].side == 'SELL'){
-var o = await client.createOrder('BTC/USDT', "Limit", 'buy', qty, price - dollars)
-orders.push(parseFloat(o.id))
-console.log(orders)
+sellTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
 }
 else {
-    var o = await client.createOrder('BTC/USDT', "Limit", 'sell', qty, price + dollars)
-    orders.push(parseFloat(o.id))
-    console.log(orders)
+buyTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
+
 }
 }
         }

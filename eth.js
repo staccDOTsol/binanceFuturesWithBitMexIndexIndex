@@ -12,8 +12,8 @@ var llast
 var sellTps = []
 var kvalue = 5
 var dvalue = 3
-var trailingTp = 0.2
-trailingTp = parseFloat(process.env.trailingTp)
+var ethtrailingTp = 0.2
+ethtrailingTp = parseFloat(process.env.ethtrailingTp)
         const axios = require('axios')
 
 var request = require('request')
@@ -530,10 +530,10 @@ setInterval(async function() {
             tradesArr.push(trades[t].id)
 
 if (trades[t].side == 'SELL'){
-sellTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
+sellTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (ethtrailingTp / 100))})
 }
 else {
-buyTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
+buyTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (ethtrailingTp / 100))})
 
 }
             /*
