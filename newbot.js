@@ -38,7 +38,7 @@ catch(err){
 for (var tp in buyTps){
     console.log('last: ' + last)
     console.log('llast: ' + llast)
-    if (llast < last){
+    if (llast < last && last > sellTps[t].entry){
         diff = last / llast
         buyTps[tp].price = parseFloat(buyTps[tp].price) * diff
     console.log('last: ' + last)
@@ -56,7 +56,7 @@ orders.push(parseFloat(o.id))
 }
 for (var tp in sellTps){
 
-    if (llast > last){
+    if (llast > last && last < sellTps[t].entry){
         diff = last / llast
         sellTps[tp].price = sellTps[tp].price * diff
     } else{
@@ -101,10 +101,12 @@ if (orders[o] == trades[t].orderId){
             tradesArr.push(trades[t].id)
 
 if (trades[t].side == 'SELL'){
-sellTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
+sellTps.push({entry: parseFloat(trades[t].price), qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
+
+
 }
 else {
-buyTps.push({qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
+buyTps.push({entry: parseFloat(trades[t].price), qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
 
 }
 }

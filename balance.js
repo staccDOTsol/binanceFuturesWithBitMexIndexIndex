@@ -102,6 +102,11 @@ first = false;
 console.log(btcstart)
 console.log(btc)
 if (btc != 0){
+  if (btcbtc.length > 120){
+    btcbtc.shift()
+    btcs.shift()
+    bals.shift()
+  }
   btcbtc.push( [new Date().getTime(), btc])
 btcs.push( [new Date().getTime(), -1 * (1-(btc / btcstart)) * 100])
 bals.push([new Date().getTime(), btc])
