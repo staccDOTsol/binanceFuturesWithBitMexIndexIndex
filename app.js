@@ -67,7 +67,7 @@ sltps.push(parseFloat(o.id))
 }
 for (var tp in sellTps){
 
-    if (llast > last&& last > parseFloat(buyTps[tp].entry)){
+    if (llast > last&& last > parseFloat(sellTps[tp].entry)){
         diff = last / llast
         sellTps[tp].price = sellTps[tp].price * diff
     } else{
