@@ -37,7 +37,7 @@ for (var tp in buyTps){
     console.log('llast: ' + llast)
     if (llast < last){
         diff = last / llast
-        buyTps[tp].price = parseFloat(buyTps[tp].price) * (((diff - 1) / 100) + 1)
+        buyTps[tp].price = parseFloat(buyTps[tp].price) * diff
     console.log('last: ' + last)
     console.log('llast: ' + last)
     console.log('diff: ' + diff)
@@ -55,7 +55,7 @@ for (var tp in sellTps){
 
     if (llast > last){
         diff = last / llast
-        sellTps[tp].price = sellTps[tp].price * (((diff - 1) / 100) + 1)
+        sellTps[tp].price = sellTps[tp].price * diff
     } else{
         if (sellTps[tp].price < last && last < sellTps[tp].entry){
             console.log('exit sell tp, price: ' + last + ' and sellTps price: ' + sellTps[tp].price)
