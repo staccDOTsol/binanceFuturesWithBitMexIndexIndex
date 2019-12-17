@@ -3,6 +3,8 @@ var highRSI = 99
 var minCrossSell = 0.0025
 var minCrossBuy = 0.0025
 var leverage
+
+var limiter = require('limiter')
 var useMFI = false
 var rsiTF = 1
 var mfiTF = 1
@@ -35,7 +37,7 @@ for (var tp in buyTps){
     console.log('llast: ' + llast)
     if (llast < last){
         diff = last / llast
-        buyTps[tp].price = parseFloat(buyTps[tp].price) * diff
+        buyTps[tp].price = parseFloat(buyTps[tp].price) * (((diff - 1) / 100) + 1)
     console.log('last: ' + last)
     console.log('llast: ' + last)
     console.log('diff: ' + diff)
@@ -53,7 +55,7 @@ for (var tp in sellTps){
 
     if (llast > last){
         diff = last / llast
-        sellTps[tp].price = sellTps[tp].price * diff
+        sellTps[tp].price = sellTps[tp].price * (((diff - 1) / 100) + 1)
     } else{
         if (sellTps[tp].price < last && last < sellTps[tp].entry){
             console.log('exit sell tp, price: ' + last + ' and sellTps price: ' + sellTps[tp].price)

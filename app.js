@@ -30,6 +30,7 @@ if (log == 'false'){
 else {
     log = true
 }
+var limiter = require('limiter')
         const axios = require('axios')
 
 var request = require('request')
@@ -50,7 +51,7 @@ for (var tp in buyTps){
     console.log('llast: ' + llast)
     if (llast < last){
         diff = last / llast
-        buyTps[tp].price = parseFloat(buyTps[tp].price) * diff
+        buyTps[tp].price = parseFloat(buyTps[tp].price) * (((diff - 1) / 100) + 1)
     console.log('last: ' + last)
     console.log('llast: ' + last)
     console.log('diff: ' + diff)
@@ -68,7 +69,7 @@ for (var tp in sellTps){
 
     if (llast > last){
         diff = last / llast
-        sellTps[tp].price = sellTps[tp].price * diff
+        sellTps[tp].price = sellTps[tp].price * (((diff - 1) / 100) + 1)
     } else{
         if (sellTps[tp].price < last  && last < sellTps[tp].entry){
             console.log('exit sell tp, price: ' + last + ' and sellTps price: ' + sellTps[tp].price)
@@ -121,11 +122,7 @@ var maxFreePerc = parseFloat(process.env.maxFreePerc)
 var orderSizeMult = parseFloat(process.env.orderSizeMult)
 const ccxt = require('ccxt')
 var bitmex = new ccxt.bitmex()
-const binance = require('./node-binance-api')().options({
-  APIKEY: key,
-  APISECRET: secret,
-  useServerTime: true // If you get timestamp errors, synchronize to server time at startup
-});
+
 var doWithdraw = process.env.doWithdraw
 if (doWithdraw == 'true'){
     doWithdraw = true
@@ -387,7 +384,7 @@ if (log){
         if (doWithdraw){
         if (pnlusd > ((min_withdrawal_percent * 100) * 2)) {
             var new_usd_init = bal_usd * (1 - (min_withdrawal_percent));
-            binance.mgTransferMarginToMain('USDT', (min_withdrawal_percent) * bal_usd, (error, response) => {
+           /* binance.mgTransferMarginToMain('USDT', (min_withdrawal_percent) * bal_usd, (error, response) => {
                 if (error) {
                     console.log(error)
                 } else {
@@ -395,7 +392,7 @@ if (log){
                     usd_init = new_usd_init
                     initial_bal = usd_init / LB;
                 }
-            });
+            }); */
         }
         }
         cancelall()

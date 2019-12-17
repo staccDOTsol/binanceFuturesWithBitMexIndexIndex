@@ -13,6 +13,7 @@
     "ejs": "*",
     "express": "*",
     "https-proxy-agent": "^4.0.0",
+    "limiter": "^1.1.4",
     "node-binance-api": "file:node-binance-api",
     "request": "^2.88.0",
     "socks-proxy-agent": "^4.0.2",
