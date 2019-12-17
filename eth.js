@@ -46,7 +46,7 @@ for (var tp in buyTps){
         if (buyTps[tp].price > last && buyTps[tp].entry < last ){// enter 8000 go up 9000 go down 8500
             console.log('exit buy tp, price: ' + last + ' and buyTp price: ' + buyTps[tp].price)
             var o = await client.createOrder('BTC/USDT', "Limit", 'sell', buyTps[tp].qty, buyTps[tp].price - 100)
-orders.push(parseFloat(o.id))
+sltps.push(parseFloat(o.id))
             buyTps.splice(buyTps[tp], 1)
         }
     }
@@ -60,7 +60,7 @@ for (var tp in sellTps){
         if (sellTps[tp].price < last && last < sellTps[tp].entry){
             console.log('exit sell tp, price: ' + last + ' and sellTps price: ' + sellTps[tp].price)
             var o = await client.createOrder('BTC/USDT', "Limit", 'buy', sellTps[tp].qty, sellTps[tp].price + 100)
-orders.push(parseFloat(o.id))
+sltps.push(parseFloat(o.id))
             sellTps.splice(sellTps[tp], 1)
         }
     }
