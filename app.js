@@ -5,6 +5,7 @@ var minCrossBuy = 0.0025
 var useMFI = false
 var rsiTF = 1
 var mfiTF = 1
+var leverage
 var trailingTp = 0.2
 trailingTp = parseFloat(process.env.trailingTp)
 var period = 54
@@ -55,7 +56,7 @@ for (var tp in buyTps){
     console.log('diff: ' + diff)
     console.log('buytpstpprice: ' + buyTps[tp].price)
     } else{
-        if (buyTps[tp].price > last && buyTps[tp].price > last ){
+        if (buyTps[tp].price > last && buyTps[tp].entry < last ){
             console.log('exit buy tp, price: ' + last + ' and buyTp price: ' + buyTps[tp].price)
             var o = await client.createOrder('BTC/USDT', "Limit", 'sell', buyTps[tp].qty, buyTps[tp].price - 100)
 orders.push(parseFloat(o.id))
@@ -289,6 +290,7 @@ setInterval(async function() {
     HA = ticker.last - 0.5
     if (pos[0] != undefined) {
         position = parseFloat(pos[0]['positionAmt'])
+        leverage = parseFloat(pos[0]['leverage'])
         unrealized = parseFloat(pos[0]['unRealizedProfit']) / (position * HA) * parseFloat(pos[0]['leverage']) * 100
         if (position < 0) {
             unrealized = unrealized * -1
@@ -560,10 +562,10 @@ setInterval(async function() {
             tradesArr.push(trades[t].id)
 
 if (trades[t].side == 'SELL'){
-sellTps.push({entry: parseFloat(trades[t].price),qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / 100))})
+sellTps.push({entry: parseFloat(trades[t].price),qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (trailingTp / (100 * leverage)))})
 }
 else {
-buyTps.push({entry: parseFloat(trades[t].price),qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / 100))})
+buyTps.push({entry: parseFloat(trades[t].price),qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (trailingTp / (100 * leverage)))})
 
 }
             /*
