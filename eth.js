@@ -538,10 +538,11 @@ setInterval(async function() {
             tradesArr.push(trades[t].id)
 
 if (trades[t].side == 'SELL'){
-sellTps.push({entry: parseFloat(trades[t].price), qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (ethtrailingTp / (100 * leverage)))})
+
+//sellTps.push({entry: parseFloat(trades[t].price), qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 + (ethtrailingTp / (100 * leverage)))})
 }
 else {
-buyTps.push({entry: parseFloat(trades[t].price), qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (ethtrailingTp / (100 * leverage)))})
+///buyTps.push({entry: parseFloat(trades[t].price), qty: parseFloat(trades[t].qty), price: parseFloat(trades[t].price) * (1 - (ethtrailingTp / (100 * leverage)))})
 
 }
             /*
