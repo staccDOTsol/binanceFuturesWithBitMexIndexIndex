@@ -6,7 +6,7 @@ var leverage
 
 var limiter = require('limiter')
 var useMFI = false
-var rsiTF = 1
+var rsiTF = '1m'
 var mfiTF = 1
 var period = 54
 var buyTps = []
@@ -76,7 +76,7 @@ request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
         highRSI = parseFloat(j.highRSI)
         minCrossSell = parseFloat(j.minCrossSell)
         minCrossBuy = parseFloat(j.minCrossBuy)
-        rsiTF = parseFloat(j.RSItf)
+        rsiTF = (j.RSItf)
         period = parseFloat(j.RSIPeriod) 
     }
     catch (err){
@@ -220,7 +220,7 @@ setInterval(async function() {
         for (var t in trades) {
             tradesArr.push(trades[t].id)
         }
-        ohlcv = await client2.fetchOHLCV('ETH/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 74, params = {})
+        ohlcv = await client2.fetchOHLCV('ETH/USDT', timeframe = rsiTF.toString(), since = undefined, limit = 74, params = {})
         //console.log(ohlcv)
         var c = 0;
         for (var b in ohlcv) {
@@ -393,7 +393,7 @@ var buysell = -1
 var theRSI = []
 var theMFI = []
 setInterval(async function() {
-    ohlcv = await client2.fetchOHLCV('ETH/USDT', timeframe = rsiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
+    ohlcv = await client2.fetchOHLCV('ETH/USDT', timeframe = rsiTF.toString(), since = undefined, limit = 1000, params = {})
     //console.log(ohlcv)
     var c = 0;
     for (var b in ohlcv) {
@@ -461,7 +461,7 @@ setInterval(async function() {
         a = 0;
         b++;
     }
-    if (b == rsiTF) {
+    if (b == 1) {
         b = 0;
     }
     //console.log(theRSI[theRSI.length-1].k)
