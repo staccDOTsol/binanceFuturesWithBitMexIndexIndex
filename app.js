@@ -15,7 +15,7 @@ var llast
 var sellTps = []
 var kvalue = 5
 var dvalue = 3
-var doRequest = false
+var doRequest = true
 var debug = process.env.debug
 if (debug == 'true'){
     debug = true

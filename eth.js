@@ -4,6 +4,8 @@ var minCrossSell = 0.0025
 var minCrossBuy = 0.0025
 var leverage
 
+var doRequest = true
+
 var limiter = require('limiter')
 var useMFI = false
 var rsiTF = '1m'
@@ -69,6 +71,7 @@ sltps.push(parseFloat(o.id))
 }, 5000)
 async function getVars(){
 
+if (doRequest){
 request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
     try {
         j = JSON.parse(d)
@@ -83,6 +86,7 @@ request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
         console.log(err)
     }
 })
+}
 
 }
 getVars()
