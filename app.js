@@ -2,8 +2,9 @@ var lowRSI = 3.5
 var highRSI = 99
 var minCrossSell = 0.0025
 var minCrossBuy = 0.0025
-var useMFI = false
+var useMFI = true
 var rsiTF = '1m'
+var strat = process.env.strat
 var mfiTF = 1
 var leverage
 var trailingTp = 0.2
@@ -30,7 +31,6 @@ if (log == 'false'){
 else {
     log = true
 }
-var limiter = require('limiter')
         const axios = require('axios')
 
 var request = require('request')
@@ -85,14 +85,31 @@ async function getVars(){
 if (doRequest){
 request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
     try {
-        j = JSON.parse(d)
+        if (strat == 'a'){
+                j = JSON.parse(d).a
+        lowRSI = parseFloat(j.lowRSI)
+        highRSI = parseFloat(j.highRSI)
+        highRSI =  70
+        lowRSI = 30
+        minCrossSell = parseFloat(j.minCrossSell)
+        minCrossBuy = parseFloat(j.minCrossBuy)
+        minCrossBuy = 0
+        minCrossSell = 0.005
+        rsiTF = (j.RSItf) + 'm'
+        period = parseFloat(j.RSIPeriod)
+        console.log(rsiTF) 
+    }
+else{
+                j = JSON.parse(d).b
         lowRSI = parseFloat(j.lowRSI)
         highRSI = parseFloat(j.highRSI)
         minCrossSell = parseFloat(j.minCrossSell)
         minCrossBuy = parseFloat(j.minCrossBuy)
-        rsiTF = (j.RSItf)
+        rsiTF = (j.RSItf) + 'm'
         period = parseFloat(j.RSIPeriod) 
-    }
+
+}
+}
     catch (err){
         console.log(err)
     }
@@ -130,6 +147,11 @@ if (doWithdraw == 'true'){
     doWithdraw = false
 }
 var withdrawMin 
+const binance = require('./node-binance-api')().options({
+  APIKEY: key,
+  APISECRET: secret,
+  useServerTime: true // If you get timestamp errors, synchronize to server time at startup
+});
 
 var client = new ccxt.binance({
     "apiKey": key,
@@ -236,7 +258,7 @@ setInterval(async function() {
         for (var t in trades) {
             tradesArr.push(trades[t].id)
         }
-        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF.toString(), since = undefined, limit = 74, params = {})
+        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF, since = undefined, limit = 74, params = {})
         //console.log(ohlcv)
         var c = 0;
         for (var b in ohlcv) {
@@ -249,20 +271,6 @@ setInterval(async function() {
                 rsis[0].shift()
             }
         }
-        ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 1000, params = {})
-        //console.log(ohlcv)
-        high = []
-        low = []
-        close = []
-        volume = []
-        for (var o in ohlcvs) {
-            high.push(ohlcvs[o][2])
-            low.push(ohlcvs[o][3])
-            close.push(ohlcvs[o][4])
-            volume.push(ohlcvs[o][5])
-        }
-        //console.log(rsis[0])
-        //console.log(high)
         theRSI = RSI.calculate({
             rsiPeriod: period,
             stochasticPeriod: period,
@@ -270,16 +278,7 @@ setInterval(async function() {
             dPeriod: dvalue,
             values: rsis[0]
         });
-
-        theMFI = MFI.calculate({
-            period: 14,
-            high: high,
-            low: low,
-            close: close,
-            volume: volume
-        });
-        //console.log(theMFI[theMFI.length-1])
-    }
+}
     pos = await client.fapiPrivateGetPositionRisk()
     ticker = await client.fetchTicker('BTC/USDT')
     LB = ticker.last + 0.5
@@ -384,7 +383,7 @@ if (log){
         if (doWithdraw){
         if (pnlusd > ((min_withdrawal_percent * 100) * 2)) {
             var new_usd_init = bal_usd * (1 - (min_withdrawal_percent));
-           /* binance.mgTransferMarginToMain('USDT', (min_withdrawal_percent) * bal_usd, (error, response) => {
+            binance.mgTransferMarginToMain('USDT', (min_withdrawal_percent) * bal_usd, (error, response) => {
                 if (error) {
                     console.log(error)
                 } else {
@@ -392,7 +391,7 @@ if (log){
                     usd_init = new_usd_init
                     initial_bal = usd_init / LB;
                 }
-            }); */
+            }); 
         }
         }
         cancelall()
@@ -400,23 +399,33 @@ if (log){
     count++;
 }, 2500)
 var count = 0;
+const RSI2 = require('technicalindicators').RSI;
+const ADX = require('technicalindicators').ADX;
 const RSI = require('technicalindicators').StochasticRSI;
 const MFI = require('technicalindicators').MFI;
 var rsis = []
+var moreover = false
+var morebelow = false
 var rsiover = false;
 var rsibelow = false;
 var mfiover = false;
 var mfibelow = false;
+var adxover = false;
+var adxbelow = false;
+var rsi2over = false;
+var rsi2below = false;
 var a = 0
 var b = 0;
 var rsicount = 0;
 var buysell = -1
 var theRSI = []
 var theMFI = []
+var theRSI2 = []
 setInterval(async function() {
-    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF.toString, since = undefined, limit = 1000, params = {})
+    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = rsiTF, since = undefined, limit = 1000, params = {})
     //console.log(ohlcv)
     var c = 0;
+    var ohlcvs = []
     for (var b in ohlcv) {
         ohlcvs.push[ohlcv[b]]
         if (rsis[0] == undefined) {
@@ -427,6 +436,27 @@ setInterval(async function() {
             rsis[0].shift()
         }
     }
+            high = []
+        low = []
+        close = []
+        volume = []
+        for (var o in ohlcv) {
+            high.push(ohlcv[o][2])
+            low.push(ohlcv[o][3])
+            close.push(ohlcv[o][4])
+            volume.push(ohlcv[o][5])
+        }
+        theMFI = MFI.calculate({
+            period: 14,
+            high: high,
+            low: low,
+            close: close,
+            volume: volume
+        });
+        theADX = ADX.calculate({period: 14, high: high,
+            low: low,
+            close: close})
+theRSI2 = RSI2.calculate({period: 14, values: rsis[0]})
     theRSI = RSI.calculate({
         rsiPeriod: period,
         stochasticPeriod: period,
@@ -435,27 +465,9 @@ setInterval(async function() {
         values: rsis[0]
     });
     //console.log(theRSI[theRSI.length-1].k)
-    ohlcv = await client2.fetchOHLCV('BTC/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 17, params = {})
-    high = []
-    low = []
-    close = []
-    volume = []
-    for (var o in ohlcv) {
-        high.push(ohlcv[o][2])
-        low.push(ohlcv[o][3])
-        close.push(ohlcv[o][4])
-        volume.push(ohlcv[o][5])
-    }
-    //console.log(high)
-    theMFI = MFI.calculate({
-        period: 14,
-        high: high,
-        low: low,
-        close: close,
-        volume: volume
-    });
+    
     //console.log(theMFI[theMFI.length-1])
-
+    console.log(theRSI[theRSI.length - 1].k)
     if (theRSI[theRSI.length - 1].k > highRSI) {
         rsiover = true;
     } else {
@@ -466,6 +478,20 @@ setInterval(async function() {
     } else {
         rsibelow = false;
     }
+
+console.log(theADX[theADX.length - 1].adx)
+    if (theADX[theADX.length - 1].adx > highRSI) {
+        adxover = true;
+    } else {
+        adxover = false;
+    }
+    if (theADX[theADX.length - 1].adx < lowRSI) {
+        adxbelow = true;
+    } else {
+        adxbelow = false;
+    }
+
+    console.log(theMFI[theMFI.length - 1])
     if (theMFI[theMFI.length - 1] > highRSI) {
         mfiover = true;
     } else {
@@ -476,8 +502,57 @@ setInterval(async function() {
     } else {
         mfibelow = false;
     }
+    console.log(theRSI2[theRSI2.length - 1])
+    if (theRSI2[theRSI2.length - 1] > highRSI) {
+        rsi2over = true;
+    } else {
+        rsi2over = false;
+    }
+    if (theRSI2[theRSI2.length - 1] < lowRSI) {
+        rsi2below = true;
+    } else {
+        rsi2below = false;
+    }
     a++
 
+    abc123 = 0
+    if (adxover == true){
+        abc123++
+    }
+    if (rsiover == true){
+        abc123++
+    }
+    if (rsi2over == true){
+        abc123++
+    }
+    if (mfiover == true){
+        abc123++
+    }
+    if (abc123 >= 3){
+        moreover = true
+    }
+    else {
+        moreover = false
+    }
+    abc123 = 0
+    if (adxbelow == true){
+        abc123++
+    }
+    if (rsibelow == true){
+        abc123++
+    }
+    if (rsi2below == true){
+        abc123++
+    }
+    if (mfibelow == true){
+        abc123++
+    }
+    if (abc123 >= 3){
+        morebelow = true
+    }
+    else {
+        morebelow = false
+    }
     if (a == 60) {
         a = 0;
         b++;
@@ -611,7 +686,7 @@ async function doit() {
             }
             diff = price / index;
             diff = -1 * (1 - diff) * 100
-            if (diff < -1 * minCrossSell && rsiover) { //} && (useMFI && mfiover)){
+            if (diff < -1 * minCrossSell && moreover){
                 console.log('it wants to sell 1')
                 if (selling == 0){// && (freePerc < maxFreePerc || position > 0)) {
                     console.log('it wants to sell 2')
@@ -638,7 +713,7 @@ async function doit() {
                         console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' sell!') //ask
                     }
                 }
-            } else if (diff > minCrossBuy && diff < 100000 && rsibelow) { //} && (useMFI && mfibelow)){
+            } else if (diff > minCrossBuy && diff < 100000 && morebelow){
                 console.log('it wants to buy 1')
                 if (buying == 0){// && (freePerc < maxFreePerc || position < 0)) {
                     console.log('it wants to buy 2')
@@ -715,3 +790,4 @@ ws.addStream('.BXBT', 'instrument', async function(data, symbol, tableName) {
     doit()
 });
 */
+

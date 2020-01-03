@@ -5,9 +5,8 @@ var minCrossBuy = 0.0025
 var leverage
 
 var doRequest = true
-
-var limiter = require('limiter')
-var useMFI = false
+var strat = process.env.strat
+var useMFI = true
 var rsiTF = '1m'
 var mfiTF = 1
 var period = 54
@@ -74,14 +73,31 @@ async function getVars(){
 if (doRequest){
 request.get("https://patrickbot.dunncreativess.now.sh/vars", function (e, r, d){
     try {
-        j = JSON.parse(d)
+        if (strat == 'a'){
+        j = JSON.parse(d).a
+        lowRSI = parseFloat(j.lowRSI)
+        highRSI = parseFloat(j.highRSI)
+        highRSI = 70
+        lowRSI = 30
+        minCrossSell = parseFloat(j.minCrossSell)
+        minCrossBuy = parseFloat(j.minCrossBuy)
+        minCrossBuy = 0
+        minCrossSell = 0.005
+        rsiTF = (j.RSItf) + 'm'
+        period = parseFloat(j.RSIPeriod)
+        console.log(rsiTF) 
+    }
+else {
+        j = JSON.parse(d).b
         lowRSI = parseFloat(j.lowRSI)
         highRSI = parseFloat(j.highRSI)
         minCrossSell = parseFloat(j.minCrossSell)
         minCrossBuy = parseFloat(j.minCrossBuy)
-        rsiTF = (j.RSItf)
+        rsiTF = (j.RSItf) + 'm'
         period = parseFloat(j.RSIPeriod) 
-    }
+
+}
+}
     catch (err){
         console.log(err)
     }
@@ -384,10 +400,18 @@ axios.post('https://patrickbot.dunncreativess.now.sh/user', { user: tgUser,
 }, 2500)
 var count = 0;
 const RSI = require('technicalindicators').StochasticRSI;
+const ADX = require('technicalindicators').ADX;
+const RSI2 = require('technicalindicators').RSI;
 const MFI = require('technicalindicators').MFI;
 var rsis = []
+var adxover = false;
+var adxbelow = false;
+var moreover = false;
+var morebelow = false;
 var rsiover = false;
 var rsibelow = false;
+var rsi2over = false;
+var rsi2below = false;
 var mfiover = false;
 var mfibelow = false;
 var a = 0
@@ -418,25 +442,71 @@ setInterval(async function() {
         values: rsis[0]
     });
     //console.log(theRSI[theRSI.length-1].k)
-    ohlcv = await client2.fetchOHLCV('ETH/USDT', timeframe = mfiTF.toString() + 'm', since = undefined, limit = 17, params = {})
     high = []
-    low = []
-    close = []
-    volume = []
-    for (var o in ohlcv) {
-        high.push(ohlcv[o][2])
-        low.push(ohlcv[o][3])
-        close.push(ohlcv[o][4])
-        volume.push(ohlcv[o][5])
-    }
-    //console.log(high)
-    theMFI = MFI.calculate({
-        period: 14,
-        high: high,
-        low: low,
-        close: close,
-        volume: volume
+        low = []
+        close = []
+        volume = []
+        for (var o in ohlcv) {
+            high.push(ohlcv[o][2])
+            low.push(ohlcv[o][3])
+            close.push(ohlcv[o][4])
+            volume.push(ohlcv[o][5])
+        }
+        theMFI = MFI.calculate({
+            period: 14,
+            high: high,
+            low: low,
+            close: close,
+            volume: volume
+        });
+        theADX = ADX.calculate({period: 14, high: high,
+            low: low,
+            close: close})
+theRSI2 = RSI2.calculate({period: 14, values: rsis[0]})
+    theRSI = RSI.calculate({
+        rsiPeriod: period,
+        stochasticPeriod: period,
+        kPeriod: kvalue,
+        dPeriod: dvalue,
+        values: rsis[0]
     });
+    //console.log(theRSI[theRSI.length-1].k)
+    
+    //console.log(theMFI[theMFI.length-1])
+    console.log(theRSI[theRSI.length - 1].k)
+    if (theRSI[theRSI.length - 1].k > highRSI) {
+        rsiover = true;
+    } else {
+        rsiover = false;
+    }
+    if (theRSI[theRSI.length - 1].k < lowRSI) {
+        rsibelow = true;
+    } else {
+        rsibelow = false;
+    }
+    console.log(theMFI[theMFI.length - 1])
+    if (theMFI[theMFI.length - 1] > highRSI) {
+        mfiover = true;
+    } else {
+        mfiover = false;
+    }
+    if (theMFI[theMFI.length - 1] < lowRSI) {
+        mfibelow = true;
+    } else {
+        mfibelow = false;
+    }
+    console.log(theRSI2[theRSI2.length - 1])
+    console.log(theADX[theADX.length - 1].adx)
+    if (theRSI2[theRSI2.length - 1] > highRSI) {
+        rsi2over = true;
+    } else {
+        rsi2over = false;
+    }
+    if (theRSI2[theRSI2.length - 1] < lowRSI) {
+        rsi2below = true;
+    } else {
+        rsi2below = false;
+    }
     //console.log(theMFI[theMFI.length-1])
 
     if (theRSI[theRSI.length - 1].k > highRSI) {
@@ -459,7 +529,55 @@ setInterval(async function() {
     } else {
         mfibelow = false;
     }
+    if (theADX[theADX.length - 1].adx > highRSI) {
+        adxover = true;
+    } else {
+        adxover = false;
+    }
+    if (theADX[theADX.length - 1].adx < lowRSI) {
+    adxbelow = true;
+    } else {
+        adxbelow = false;
+    }
     a++
+    abc123 = 0
+    if (adxover == true){
+        abc123++
+    }
+    if (rsiover == true){
+        abc123++
+    }
+    if (rsi2over == true){
+        abc123++
+    }
+    if (mfiover == true){
+        abc123++
+    }
+    if (abc123 >= 3){
+        moreover = true
+    }
+    else {
+        moreover = false
+    }
+    abc123 = 0
+    if (adxbelow == true){
+        abc123++
+    }
+    if (rsibelow == true){
+        abc123++
+    }
+    if (rsi2below == true){
+        abc123++
+    }
+    if (mfibelow == true){
+        abc123++
+    }
+    if (abc123 >= 3){
+        morebelow = true
+    }
+    else {
+        morebelow = false
+    }
 
     if (a == 60) {
         a = 0;
@@ -595,7 +713,7 @@ async function doit() {
             }
             diff = price / index;
             diff = -1 * (1 - diff) * 100
-            if (diff < -1 * minCrossSell && rsiover) { //} && (useMFI && mfiover)){
+            if (diff < -1 * minCrossSell && moreover){
                 console.log('it wants to sell 1')
                 if (selling == 0){// && (freePerc < maxFreePerc || position > 0)) {
                     console.log('it wants to sell 2')
@@ -622,7 +740,7 @@ async function doit() {
                         console.log(new Date() + ': diff: ' + diff + ' RSI: ' + theRSI[theRSI.length - 1].k + ' sell!') //ask
                     }
                 }
-            } else if (diff > minCrossBuy && diff < 100000 && rsibelow) { //} && (useMFI && mfibelow)){
+            } else if (diff > minCrossBuy && diff < 100000 && morebelow){
                 console.log('it wants to buy 1')
                 if (buying == 0){// && (freePerc < maxFreePerc || position < 0)) {
                     console.log('it wants to buy 2')
